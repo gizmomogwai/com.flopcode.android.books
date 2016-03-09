@@ -23,6 +23,12 @@ android {
 dependencies {
   compile 'com.android.support:appcompat-v7:23.2.0'
   compile 'com.android.support:design:23.2.0'
+  compile 'com.google.code.gson:gson:2.6.2'
+  compile 'com.google.guava:guava:19.0'
+  compile 'com.squareup.retrofit2:retrofit:2.0.0-beta4'
+  testCompile 'junit:junit:4.12'
+  testCompile 'org.hamcrest:hamcrest-core:1.3'
+
 }
 
 // from http://stackoverflow.com/a/22597752

@@ -1,15 +1,27 @@
 <?xml version="1.0" encoding="utf-8"?>
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
-          package="com.flopcode.android.books">
+    package="com.flopcode.android.books" >
 
-  <application>
-    <activity
-      android:name=".Books"
-      android:label="@string/title_activity_books">
-      <intent-filter>
-        <action android:name="android.intent.action.MAIN"/>
-        <category android:name="android.intent.category.LAUNCHER"/>
-      </intent-filter>
-    </activity>
-  </application>
+    <uses-permission android:name="android.permission.INTERNET" />
+
+    <application android:theme="@android:style/Theme.Material.Light" >
+        <activity
+            android:name=".Books"
+            android:label="@string/title_activity_books" >
+            <intent-filter>
+                <action android:name="android.intent.action.MAIN" />
+
+                <category android:name="android.intent.category.LAUNCHER" />
+            </intent-filter>
+        </activity>
+        <activity
+            android:name=".AddBook"
+            android:label="@string/title_activity_add_book"
+            android:parentActivityName=".Books" >
+            <meta-data
+                android:name="android.support.PARENT_ACTIVITY"
+                android:value="com.flopcode.android.books.Books" />
+        </activity>
+    </application>
+
 </manifest>
