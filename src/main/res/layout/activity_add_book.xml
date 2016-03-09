@@ -10,34 +10,36 @@
   android:orientation="vertical"
   tools:context="com.flopcode.android.books.AddBook">
 
+  <EditText
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:inputType="textPersonName"
+    android:text="@string/isbn_form_entry"
+    android:ems="10"
+    android:id="@+id/book_isbn"/>
 
   <EditText
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
     android:inputType="textPersonName"
-    android:text="Title"
+    android:text="@string/title_form_entry"
     android:ems="10"
-    android:id="@+id/title"/>
+    android:id="@+id/book_title"/>
+
   <EditText
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
     android:inputType="textPersonName"
-    android:text="Authors"
+    android:text="@string/authors_form_entry"
     android:ems="10"
-    android:id="@+id/authors"/>
+    android:id="@+id/book_authors"/>
+
   <Spinner
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
-    android:id="@+id/owner"
-    android:layout_gravity="center_horizontal"/>
+    android:layout_gravity="center_horizontal"
+    android:id="@+id/book_owner"/>
 
-  <EditText
-    android:layout_width="match_parent"
-    android:layout_height="wrap_content"
-    android:inputType="textPersonName"
-    android:text="ISBN"
-    android:ems="10"
-    android:id="@+id/isbn"/>
 
   <LinearLayout
     android:layout_width="match_parent"
@@ -51,13 +53,15 @@
       android:layout_weight="1.0"
       android:text="@string/cancel"
       android:id="@+id/cancel_button"/>
+
     <Button
       style="?android:attr/buttonStyleSmall"
       android:layout_width="fill_parent"
       android:layout_height="wrap_content"
-      android:text="@string/ok"
-      android:id="@+id/ok_button"
       android:layout_weight="1.0"
-      android:layout_gravity="right"/>
+      android:id="@+id/ok_button"
+      android:text="@string/ok"/>
+
   </LinearLayout>
+
 </LinearLayout>
