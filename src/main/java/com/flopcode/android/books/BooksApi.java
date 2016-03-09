@@ -42,6 +42,9 @@ public class BooksApi {
     @GET("books/{id}.json")
     Call<Book> book(@Path("id") String id);
 
+    @GET("books.json")
+    Call<List<Book>> index();
+
     @FormUrlEncoded
     @POST("books.json")
     Call<Book> createBook(@Field("book[isbn]") String isbn, @Field("book[title]") String title, @Field("book[authors]") String authors);
@@ -91,7 +94,7 @@ public class BooksApi {
                   return (String) map.get("name");
                 }
               }));
-              return new Book(isbn, authors, title);
+              return new Book(null, isbn, authors, title);
             }
           };
         }

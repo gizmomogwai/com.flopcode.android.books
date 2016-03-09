@@ -2,6 +2,7 @@ package com.flopcode.android.books;
 
 import android.app.Activity;
 import android.app.PendingIntent;
+import android.content.Context;
 import android.content.Intent;
 import android.content.IntentFilter;
 import android.net.Uri;
@@ -68,7 +69,7 @@ public class ShowBook extends Activity {
 
           @Override
           public void onFailure(Call<Book> call, Throwable throwable) {
-            toast("could not fetch book data for bookId " + bookId);
+            toast(ShowBook.this, "could not fetch book data for bookId " + bookId);
           }
         });
       }
@@ -96,7 +97,7 @@ public class ShowBook extends Activity {
     super.onResume();
     Log.d(LOG_TAG, "ShowBook.onResume");
     if (!nfcAdapter.isEnabled()) {
-      toast("please enable nfc");
+      toast(this, "please enable nfc");
       return;
     }
 
@@ -112,21 +113,21 @@ public class ShowBook extends Activity {
         Ndef ndef = Ndef.get(detectedTag);
         ndef.connect();
         if (!ndef.isWritable()) {
-          toast("not writeable");
+          toast(this, "not writeable");
           return;
         }
         NdefMessage message = new NdefMessage(new NdefRecord[]{NdefRecord.createUri("books://1")});
         ndef.writeNdefMessage(message);
       } catch (Exception e) {
-        toast("problems " + e.getMessage());
+        toast(this, "problems " + e.getMessage());
         Log.e(LOG_TAG, "problems", e);
       }
     }
   }
 
 
-  private void toast(String s) {
-    Toast.makeText(this, s, Toast.LENGTH_LONG).show();
+  public static void toast(Context context, String s) {
+    Toast.makeText(context, s, Toast.LENGTH_LONG).show();
   }
 
   @Override
@@ -147,7 +148,7 @@ public class ShowBook extends Activity {
     switch (item.getItemId()) {
       case R.id.action_write_tag_to_book:
         nfcAdapter.enableForegroundDispatch(this, pendingIntent, new IntentFilter[]{discovery}, null);
-        toast("approach tag now");
+        toast(this, "approach tag now");
         break;
     }
     return true;
