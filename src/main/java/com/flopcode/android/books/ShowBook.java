@@ -36,14 +36,19 @@ public class ShowBook extends Activity {
 
   @Bind(R.id.book_id)
   TextView id;
+
   @Bind(R.id.book_isbn)
   TextView isbn;
+
   @Bind(R.id.book_title)
   TextView title;
+
   @Bind(R.id.book_authors)
   TextView authors;
+
   @Bind(R.id.book_owner)
   TextView owner;
+
   private Book book;
 
   @Override

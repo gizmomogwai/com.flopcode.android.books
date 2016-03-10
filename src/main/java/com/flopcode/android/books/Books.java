@@ -16,7 +16,7 @@ import android.widget.ArrayAdapter;
 import android.widget.ListView;
 import android.widget.ProgressBar;
 import butterknife.Bind;
-import butterknife.ButterKnife;
+import butterknife.OnItemClick;
 import com.flopcode.android.books.BooksApi.BooksService;
 import com.flopcode.android.books.BooksApi.IsbnLookupService;
 import com.google.zxing.integration.android.IntentIntegrator;
@@ -26,6 +26,8 @@ import retrofit2.Callback;
 import retrofit2.Response;
 
 import java.util.List;
+
+import static butterknife.ButterKnife.*;
 
 public class Books extends Activity {
 
@@ -39,26 +41,28 @@ public class Books extends Activity {
   @Override
   protected void onCreate(Bundle savedInstanceState) {
     super.onCreate(savedInstanceState);
+    Log.d(LOG_TAG, "Books.onCreate");
     booksService = BooksApi.createBooksService();
     isbnLookupService = BooksApi.createIsbnLookupService();
     setContentView(R.layout.books);
-    ButterKnife.bind(this);
+    bind(this);
 
     ProgressBar progressBar = new ProgressBar(this);
     progressBar.setLayoutParams(new LayoutParams(LayoutParams.WRAP_CONTENT, LayoutParams.WRAP_CONTENT, Gravity.CENTER));
     progressBar.setIndeterminate(true);
     books.setEmptyView(progressBar);
+  }
 
-    books.setOnItemClickListener(new OnItemClickListener() {
-      @Override
-      public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
-        Book book = (Book) books.getAdapter().getItem(position);
-        startActivity(new Intent(Books.this, ShowBook.class).putExtra("book", book));
-      }
-    });
+  @OnItemClick(R.id.listView)
+  public void showBook(AdapterView<?> parent, View view, int position, long id) {
+    Book book = (Book) books.getAdapter().getItem(position);
+    startActivity(new Intent(Books.this, ShowBook.class).putExtra("book", book));
+  }
 
-
-    Log.d(LOG_TAG, "onCreate");
+  @Override
+  protected void onResume() {
+    super.onResume();
+    Log.d(LOG_TAG, "Books.onResume");
     booksService.index().enqueue(new Callback<List<Book>>() {
       @Override
       public void onResponse(Call<List<Book>> call, Response<List<Book>> response) {
@@ -74,7 +78,6 @@ public class Books extends Activity {
         Log.e(LOG_TAG, "could not fetch list of books", throwable);
       }
     });
-    //new GetBookAsyncTask().execute("9780321635365");
   }
 
   @Override
