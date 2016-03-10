@@ -55,10 +55,12 @@ public class ShowBook extends Activity {
 
     final Intent intent = getIntent();
     Log.d(LOG_TAG, intent.toString());
-    if (intent.getAction().equals(NfcAdapter.ACTION_NDEF_DISCOVERED)) {
+    if (NfcAdapter.ACTION_NDEF_DISCOVERED.equals(intent.getAction())) {
       if (intent.getData() != null) {
         Uri uri = intent.getData();
-        final String bookId = uri.getHost();
+        Log.d(LOG_TAG, "incoming intent: " + uri);
+        final String bookId = uri.getPathSegments().get(0);
+        Log.d(LOG_TAG, "incoming intent bookId: " + bookId);
         BooksApi.createBooksService().book(bookId).enqueue(new Callback<Book>() {
           @Override
           public void onResponse(Call<Book> call, Response<Book> response) {
@@ -117,7 +119,7 @@ public class ShowBook extends Activity {
           toast(this, "not writeable");
           return;
         }
-        NdefMessage message = new NdefMessage(new NdefRecord[]{NdefRecord.createUri("books://1")});
+        NdefMessage message = new NdefMessage(new NdefRecord[]{NdefRecord.createUri("books:///1")});
         ndef.writeNdefMessage(message);
       } catch (Exception e) {
         toast(this, "problems " + e.getMessage());

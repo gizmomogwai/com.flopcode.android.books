@@ -31,9 +31,9 @@ public class BooksApi {
 
 
   private static final String FLUNDER = "192.168.1.100";
-  private static final String OFFICE = "192.168.1.100";
+  private static final String OFFICE = "172.31.2.34";
   private static final String BLACKBOX = "192.168.1.16";
-  public static final String BOOKS_SERVER_IP = BLACKBOX;
+  public static final String BOOKS_SERVER_IP = OFFICE;
 
   interface BooksService {
     @GET("users.json")
