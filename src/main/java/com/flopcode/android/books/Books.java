@@ -9,6 +9,9 @@ import android.util.Log;
 import android.view.Gravity;
 import android.view.Menu;
 import android.view.MenuItem;
+import android.view.View;
+import android.widget.AdapterView;
+import android.widget.AdapterView.OnItemClickListener;
 import android.widget.ArrayAdapter;
 import android.widget.ListView;
 import android.widget.ProgressBar;
@@ -22,7 +25,6 @@ import retrofit2.Call;
 import retrofit2.Callback;
 import retrofit2.Response;
 
-import java.io.Serializable;
 import java.util.List;
 
 public class Books extends Activity {
@@ -47,6 +49,13 @@ public class Books extends Activity {
     progressBar.setIndeterminate(true);
     books.setEmptyView(progressBar);
 
+    books.setOnItemClickListener(new OnItemClickListener() {
+      @Override
+      public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
+        Book book = (Book) books.getAdapter().getItem(position);
+        startActivity(new Intent(Books.this, ShowBook.class).putExtra("book", book));
+      }
+    });
 
 
     Log.d(LOG_TAG, "onCreate");
@@ -92,25 +101,6 @@ public class Books extends Activity {
     }
 
     return super.onOptionsItemSelected(item);
-  }
-
-  public static class Book implements Serializable {
-    public final String id;
-    public final String isbn;
-    public final String title;
-    public final String authors;
-
-    public Book(String id, String isbn, String authors, String title) {
-      this.id = id;
-      this.isbn = isbn;
-      this.authors = authors;
-      this.title = title;
-    }
-
-    @Override
-    public String toString() {
-      return "Book { id = " + id + ", isbn = " + isbn + ", title = " + title + ", authors = " + authors + " }";
-    }
   }
 
   public void onActivityResult(int requestCode, int resultCode, Intent intent) {

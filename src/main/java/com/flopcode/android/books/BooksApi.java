@@ -1,9 +1,8 @@
 package com.flopcode.android.books;
 
-import com.flopcode.android.books.Books.Book;
-import com.google.common.base.Function;
 import com.google.common.base.Joiner;
-import com.google.common.collect.Collections2;
+import com.google.common.base.Predicate;
+import com.google.common.collect.Iterables;
 import com.google.gson.Gson;
 import okhttp3.OkHttpClient;
 import okhttp3.ResponseBody;
@@ -22,6 +21,7 @@ import retrofit2.http.Path;
 import retrofit2.http.Query;
 
 import java.io.IOException;
+import java.io.StringReader;
 import java.lang.annotation.Annotation;
 import java.lang.reflect.Type;
 import java.util.List;
@@ -52,12 +52,6 @@ public class BooksApi {
 
   }
 
-  interface IsbnLookupService {
-    @GET("api/books?jscmd=data&format=json")
-    Call<Book> find(@Query("bibkeys") String isbn);
-  }
-
-
   public static BooksService createBooksService() {
     Retrofit rf = retrofitWithLogging()
       .baseUrl("http://" + BOOKS_SERVER_IP + ":3000")
@@ -75,6 +69,72 @@ public class BooksApi {
     return new Retrofit.Builder().client(httpClient);
   }
 
+  public interface IsbnLookupService {
+    @GET("books/v1/volumes")
+    Call<Book> find(@Query("q") String isbn);
+  }
+
+  public static IsbnLookupService createIsbnLookupService() {
+    Retrofit rf = retrofitWithLogging()
+      .baseUrl("https://www.googleapis.com")
+      .addConverterFactory(googleJsonFactory())
+      .build();
+
+    return rf.create(IsbnLookupService.class);
+  }
+
+  private static Factory googleJsonFactory() {
+    return new Factory() {
+      @Override
+      public Converter<ResponseBody, Book> responseBodyConverter(Type type, Annotation[] annotations, Retrofit retrofit) {
+        return googleJsonConverter();
+      }
+    };
+  }
+
+  private static Converter<ResponseBody, Book> googleJsonConverter() {
+    return new Converter<ResponseBody, Book>() {
+      @Override
+      public Book convert(ResponseBody responseBody) throws IOException {
+        Map m = new Gson().fromJson(new StringReader(responseBody.string()), Map.class);
+        Map firstItem = (Map) ((List) m.get("items")).iterator().next();
+        Map volumeInfo = (Map) firstItem.get("volumeInfo");
+        String title = (String) volumeInfo.get("title");
+        String authors = Joiner.on(", ").join((List) volumeInfo.get("authors"));
+        Map isbnMap = (Map) Iterables.find((List) volumeInfo.get("industryIdentifiers"),
+          new Predicate() {
+            @Override
+            public boolean apply(Object o) {
+              Map m = (Map) o;
+              return m.get("type").equals("ISBN_13");
+            }
+          });
+        String isbn = (String) isbnMap.get("identifier");
+        return new Book(null, isbn, title, authors);
+      }
+    };
+  }
+        /*new Factory() {
+        @Override
+        public Converter<ResponseBody, ?> responseBodyConverter(Type type, Annotation[] annotations, Retrofit retrofit) {
+          return new Converter<ResponseBody, Book>() {
+            @Override
+            public Book convert(ResponseBody responseBody) throws IOException {
+              System.out.println("responseBody.string() = " + responseBody.string());
+              Map b = new Gson().fromJson(responseBody.string(), Map.class);
+              System.out.println("b.get(\"items\").class = " + b.get("items").getClass());
+              return null;
+            }
+          };
+        }
+      }*/
+  /*
+  interface IsbnLookupService {
+    @GET("api/books?jscmd=data&format=json")
+    Call<Book> find(@Query("bibkeys") String isbn);
+  }
+*/
+/*
   public static IsbnLookupService createIsbnLookupService() {
     Retrofit rf = retrofitWithLogging()
       .baseUrl("https://openlibrary.org")
@@ -102,5 +162,5 @@ public class BooksApi {
       .build();
     return rf.create(IsbnLookupService.class);
   }
-
+*/
 }

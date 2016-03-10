@@ -26,7 +26,7 @@
     <activity
       android:name=".ShowBook"
       android:label="@string/title_activity_show_book"
-      android:parentActivityName=".Books"
+      android:parentActivityName="com.flopcode.android.books.Books"
       android:launchMode="singleTop">
       <meta-data
         android:name="android.support.PARENT_ACTIVITY"

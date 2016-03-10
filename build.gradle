@@ -29,10 +29,8 @@ dependencies {
   compile 'com.squareup.retrofit2:converter-gson:2.0.0-beta4'
   compile 'com.squareup.okhttp3:logging-interceptor:3.0.1'
   compile 'com.jakewharton:butterknife:7.0.1'
-
   testCompile 'junit:junit:4.12'
   testCompile 'org.hamcrest:hamcrest-core:1.3'
-
 }
 
 // from http://stackoverflow.com/a/22597752
@@ -51,19 +49,18 @@ android {
     minSdkVersion 21
     targetSdkVersion 23
   }
-  /*
-    signingConfigs {
+
+  signingConfigs {
     release {
-    storeFile file("release.keystore")
-    storePassword passwordFromKeychain("books")
-    keyAlias "books"
-    keyPassword passwordFromKeychain("books")
+      storeFile file("release.keystore")
+      storePassword passwordFromKeychain("books-play-store")
+      keyAlias "books"
+      keyPassword passwordFromKeychain("books-play-store")
     }
-    }
-    buildTypes {
+  }
+  buildTypes {
     release {
-    signingConfig signingConfigs.release
+      signingConfig signingConfigs.release
     }
-    }
-  */
+  }
 }

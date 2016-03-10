@@ -19,7 +19,6 @@ import android.widget.TextView;
 import android.widget.Toast;
 import butterknife.Bind;
 import butterknife.ButterKnife;
-import com.flopcode.android.books.Books.Book;
 import com.google.common.collect.Lists;
 import retrofit2.Call;
 import retrofit2.Callback;
@@ -56,7 +55,7 @@ public class ShowBook extends Activity {
 
     final Intent intent = getIntent();
     Log.d(LOG_TAG, intent.toString());
-    if (intent.getAction() == NfcAdapter.ACTION_NDEF_DISCOVERED) {
+    if (intent.getAction().equals(NfcAdapter.ACTION_NDEF_DISCOVERED)) {
       if (intent.getData() != null) {
         Uri uri = intent.getData();
         final String bookId = uri.getHost();
@@ -73,6 +72,10 @@ public class ShowBook extends Activity {
           }
         });
       }
+    }
+
+    if (intent.hasExtra("book")) {
+      mount((Book) intent.getSerializableExtra("book"));
     }
 
     nfcAdapter = NfcAdapter.getDefaultAdapter(this);
@@ -98,9 +101,7 @@ public class ShowBook extends Activity {
     Log.d(LOG_TAG, "ShowBook.onResume");
     if (!nfcAdapter.isEnabled()) {
       toast(this, "please enable nfc");
-      return;
     }
-
   }
 
   protected void onNewIntent(Intent intent) {

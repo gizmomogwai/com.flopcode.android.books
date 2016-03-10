@@ -12,7 +12,6 @@ import android.widget.Button;
 import android.widget.EditText;
 import android.widget.Spinner;
 import android.widget.Toast;
-import com.flopcode.android.books.Books.Book;
 import com.flopcode.android.books.BooksApi.BooksService;
 import retrofit2.Call;
 import retrofit2.Callback;
@@ -41,7 +40,7 @@ public class AddBook extends Activity {
     ok.setOnClickListener(new OnClickListener() {
       @Override
       public void onClick(View v) {
-        Book b = new Book(isbn.getText().toString(), title.getText().toString(), authors.getText().toString());
+        Book b = new Book(null, isbn.getText().toString(), title.getText().toString(), authors.getText().toString());
         booksService.createBook(b.isbn, b.title, b.authors).enqueue(new Callback<Book>() {
           @Override
           public void onResponse(Call<Book> call, Response<Book> response) {
