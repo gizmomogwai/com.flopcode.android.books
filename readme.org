@@ -1,0 +1,9 @@
+* Android App for Books
+
+** Todos
+*** DONE list books
+*** DONE navigate from index to one book
+*** TODO navigate back from one book to index
+*** login for users
+*** ldap support for users
+*** use better isbn lookup (google books)
