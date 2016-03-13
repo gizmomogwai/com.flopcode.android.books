@@ -1,4 +1,4 @@
-package com.flopcode.android.books;
+package com.flopcode.books.android.views;
 
 import android.app.Activity;
 import android.app.PendingIntent;
@@ -19,14 +19,18 @@ import android.widget.TextView;
 import android.widget.Toast;
 import butterknife.Bind;
 import butterknife.ButterKnife;
+import com.flopcode.books.android.BooksApi;
+import com.flopcode.books.android.BooksApplication;
+import com.flopcode.books.android.R;
+import com.flopcode.books.android.models.Book;
 import com.google.common.collect.Lists;
 import retrofit2.Call;
 import retrofit2.Callback;
 import retrofit2.Response;
 
-import static com.flopcode.android.books.Books.LOG_TAG;
+import static com.flopcode.books.android.BooksApplication.LOG_TAG;
 
-public class ShowBook extends Activity {
+public class Show extends Activity {
 
   private static final int TAG_DETECTED = 17;
   private NfcAdapter nfcAdapter;
@@ -66,7 +70,7 @@ public class ShowBook extends Activity {
         Log.d(LOG_TAG, "incoming intent: " + uri);
         final String bookId = uri.getPathSegments().get(0);
         Log.d(LOG_TAG, "incoming intent bookId: " + bookId);
-        BooksApi.createBooksService().book(bookId).enqueue(new Callback<Book>() {
+        BooksApi.createBooksService(BooksApplication.getApiKey(this)).show(bookId).enqueue(new Callback<Book>() {
           @Override
           public void onResponse(Call<Book> call, Response<Book> response) {
             book = response.body();
@@ -75,7 +79,7 @@ public class ShowBook extends Activity {
 
           @Override
           public void onFailure(Call<Book> call, Throwable throwable) {
-            toast(ShowBook.this, "could not fetch book data for bookId " + bookId);
+            toast(Show.this, "could not fetch book data for bookId " + bookId);
           }
         });
       }
@@ -146,7 +150,7 @@ public class ShowBook extends Activity {
 
   @Override
   public boolean onCreateOptionsMenu(Menu menu) {
-    getMenuInflater().inflate(R.menu.menu_show_book, menu);
+    getMenuInflater().inflate(R.menu.show, menu);
     return true;
   }
 
@@ -157,6 +161,9 @@ public class ShowBook extends Activity {
       case R.id.action_write_tag_to_book:
         nfcAdapter.enableForegroundDispatch(this, pendingIntent, new IntentFilter[]{discovery}, null);
         toast(this, "approach tag now");
+        break;
+      case R.id.action_checkout_book:
+        toast(this, "trying to get the book");
         break;
     }
     return true;

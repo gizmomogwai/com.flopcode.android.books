@@ -1,10 +1,14 @@
-package com.flopcode.android.books;
+package com.flopcode.books.android;
 
+import com.flopcode.books.android.models.Book;
 import com.google.common.base.Joiner;
 import com.google.common.base.Predicate;
 import com.google.common.collect.Iterables;
 import com.google.gson.Gson;
+import okhttp3.Interceptor;
 import okhttp3.OkHttpClient;
+import okhttp3.Request;
+import okhttp3.Response;
 import okhttp3.ResponseBody;
 import okhttp3.logging.HttpLoggingInterceptor;
 import okhttp3.logging.HttpLoggingInterceptor.Level;
@@ -35,34 +39,36 @@ public class BooksApi {
   private static final String BLACKBOX = "192.168.1.16";
   public static final String BOOKS_SERVER_IP = FLUNDER_HOME;
 
-  interface BooksService {
-    @GET("users.json")
-    Call<List<Books.User>> listUsers();
+  public interface BooksService {
+    String BOOKS_API = "api/v1/books";
 
-    @GET("books/{id}.json")
-    Call<Book> book(@Path("id") String id);
-
-    @GET("books.json")
+    //    @GET("users.json")
+    //  Call<List<User>> listUsers();
+    @GET(BOOKS_API)
     Call<List<Book>> index();
 
     @FormUrlEncoded
-    @POST("books.json")
-    Call<Book> createBook(@Field("book[isbn]") String isbn, @Field("book[title]") String title, @Field("book[authors]") String authors);
+    @POST(BOOKS_API)
+    Call<Book> create(@Field("book[isbn]") String isbn, @Field("book[title]") String title, @Field("book[authors]") String authors);
+
+    @GET(BOOKS_API + "/{id}")
+    Call<Book> show(@Path("id") String id);
   }
 
-  public static BooksService createBooksService() {
-    Retrofit rf = retrofitWithLogging()
+  public static BooksService createBooksService(String apiKey) {
+    Retrofit rf = retrofitWithLogging(apiKey)
       .baseUrl("http://" + BOOKS_SERVER_IP + ":3000")
       .addConverterFactory(GsonConverterFactory.create())
       .build();
     return rf.create(BooksService.class);
   }
 
-  private static Retrofit.Builder retrofitWithLogging() {
+  private static Retrofit.Builder retrofitWithLogging(String apiKey) {
     HttpLoggingInterceptor logging = new HttpLoggingInterceptor();
     logging.setLevel(Level.BODY);
     OkHttpClient httpClient = new OkHttpClient.Builder()
       .addInterceptor(logging)
+      .addNetworkInterceptor(new AddAuthorizationHeaderInterceptor(apiKey))
       .build();
     return new Retrofit.Builder().client(httpClient);
   }
@@ -73,7 +79,7 @@ public class BooksApi {
   }
 
   public static IsbnLookupService createIsbnLookupService() {
-    Retrofit rf = retrofitWithLogging()
+    Retrofit rf = retrofitWithLogging(null)
       .baseUrl("https://www.googleapis.com")
       .addConverterFactory(googleJsonFactory())
       .build();
@@ -112,6 +118,29 @@ public class BooksApi {
       }
     };
   }
+
+  private static class AddAuthorizationHeaderInterceptor implements Interceptor {
+    private final String apiKey;
+
+    public AddAuthorizationHeaderInterceptor(String apiKey) {
+      this.apiKey = apiKey;
+    }
+
+    @Override
+    public Response intercept(Chain chain) throws IOException {
+      if (apiKey != null) {
+        Request originalRequest = chain.request();
+        String token = "Token token=" + apiKey;
+        Request newRequest = originalRequest.newBuilder()
+          .header("Authorization", token)
+          .build();
+        return chain.proceed(newRequest);
+      } else {
+        return chain.proceed(chain.request());
+      }
+    }
+  }
+}
         /*new Factory() {
         @Override
         public Converter<ResponseBody, ?> responseBodyConverter(Type type, Annotation[] annotations, Retrofit retrofit) {
@@ -161,4 +190,3 @@ public class BooksApi {
     return rf.create(IsbnLookupService.class);
   }
 */
-}

@@ -1,4 +1,4 @@
-package com.flopcode.android.books;
+package com.flopcode.books.android.models;
 
 import java.io.Serializable;
 
