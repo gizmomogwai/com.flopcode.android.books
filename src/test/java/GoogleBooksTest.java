@@ -1,6 +1,6 @@
-import com.flopcode.android.books.Book;
-import com.flopcode.android.books.BooksApi;
-import com.flopcode.android.books.BooksApi.IsbnLookupService;
+import com.flopcode.books.android.BooksApi;
+import com.flopcode.books.android.BooksApi.IsbnLookupService;
+import com.flopcode.books.android.models.Book;
 import org.junit.Test;
 
 import static org.assertj.core.api.Assertions.assertThat;

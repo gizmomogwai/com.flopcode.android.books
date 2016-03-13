@@ -1,44 +1,65 @@
 <?xml version="1.0" encoding="utf-8"?>
-<manifest xmlns:android="http://schemas.android.com/apk/res/android"
-          package="com.flopcode.android.books">
+<manifest
+  xmlns:android="http://schemas.android.com/apk/res/android"
+  package="com.flopcode.books.android">
 
-  <uses-permission android:name="android.permission.INTERNET"/>
-  <uses-permission android:name="android.permission.NFC"/>
+  <uses-permission
+    android:name="android.permission.INTERNET"/>
+  <uses-permission
+    android:name="android.permission.NFC"/>
 
-  <application android:theme="@android:style/Theme.Material.Light">
+  <application
+    android:theme="@android:style/Theme.Material.Light">
     <activity
-      android:name=".Books"
+      android:name="com.flopcode.books.android.views.Index"
       android:label="@string/title_activity_books">
       <intent-filter>
         <action android:name="android.intent.action.MAIN"/>
-
         <category android:name="android.intent.category.LAUNCHER"/>
       </intent-filter>
     </activity>
+
     <activity
-      android:name=".AddBook"
+      android:name=".views.Add"
       android:label="@string/title_activity_add_book"
-      android:parentActivityName=".Books">
+      android:parentActivityName=".views.Index">
       <meta-data
         android:name="android.support.PARENT_ACTIVITY"
-        android:value="com.flopcode.android.books.Books"/>
+        android:value=".views.Index"/>
     </activity>
     <activity
-      android:name=".ShowBook"
+      android:name=".views.Show"
       android:label="@string/title_activity_show_book"
-      android:parentActivityName="com.flopcode.android.books.Books"
+      android:parentActivityName=".views.Index"
       android:launchMode="singleTop">
       <meta-data
         android:name="android.support.PARENT_ACTIVITY"
-        android:value="com.flopcode.android.books.Books"/>
+        android:value=".views.Index"/>
 
       <intent-filter>
         <action android:name="android.nfc.action.NDEF_DISCOVERED"/>
         <category android:name="android.intent.category.DEFAULT"/>
-        <data android:scheme="books" />
+        <data android:scheme="books"/>
       </intent-filter>
 
     </activity>
+
+    <activity
+      android:name=".views.ImportApiKey"
+      android:label="Import Api Key">
+      <intent-filter>
+        <action
+          android:name="android.intent.action.VIEW"/>
+        <category
+          android:name="android.intent.category.DEFAULT"/>
+        <category
+          android:name="android.intent.category.BROWSABLE"/>
+        <data
+          android:scheme="books-api-key"
+        />
+      </intent-filter>
+    </activity>
+    
   </application>
 
 </manifest>
