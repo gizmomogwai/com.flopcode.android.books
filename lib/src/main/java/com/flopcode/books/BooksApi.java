@@ -1,6 +1,7 @@
-package com.flopcode.books.android;
+package com.flopcode.books;
 
-import com.flopcode.books.android.models.Book;
+import com.flopcode.books.models.Book;
+import com.flopcode.books.models.Checkout;
 import com.google.common.base.Joiner;
 import com.google.common.base.Predicate;
 import com.google.common.collect.Iterables;
@@ -20,6 +21,7 @@ import retrofit2.converter.gson.GsonConverterFactory;
 import retrofit2.http.Field;
 import retrofit2.http.FormUrlEncoded;
 import retrofit2.http.GET;
+import retrofit2.http.Headers;
 import retrofit2.http.POST;
 import retrofit2.http.Path;
 import retrofit2.http.Query;
@@ -28,39 +30,58 @@ import java.io.IOException;
 import java.io.StringReader;
 import java.lang.annotation.Annotation;
 import java.lang.reflect.Type;
+import java.net.URL;
 import java.util.List;
 import java.util.Map;
 
 public class BooksApi {
 
-
   private static final String FLUNDER_HOME = "192.168.1.100";
   private static final String OFFICE = "172.31.2.34";
   private static final String BLACKBOX = "192.168.1.16";
   public static final String BOOKS_SERVER_IP = FLUNDER_HOME;
+  private final static String API = "api/v1";
+  private final static String BOOKS_API = API + "/books";
+  private final static String CHECKOUT_API = API + "/checkouts";
 
   public interface BooksService {
-    String BOOKS_API = "api/v1/books";
 
     //    @GET("users.json")
     //  Call<List<User>> listUsers();
     @GET(BOOKS_API)
+    @Headers("Accept: application/json")
     Call<List<Book>> index();
 
     @FormUrlEncoded
     @POST(BOOKS_API)
+    @Headers("Accept: application/json")
     Call<Book> create(@Field("book[isbn]") String isbn, @Field("book[title]") String title, @Field("book[authors]") String authors);
 
     @GET(BOOKS_API + "/{id}")
+    @Headers("Accept: application/json")
     Call<Book> show(@Path("id") String id);
+
   }
 
-  public static BooksService createBooksService(String apiKey) {
+  public static BooksService createBooksService(URL booksServer, String apiKey) {
     Retrofit rf = retrofitWithLogging(apiKey)
-      .baseUrl("http://" + BOOKS_SERVER_IP + ":3000")
+      .baseUrl(booksServer.toString())
       .addConverterFactory(GsonConverterFactory.create())
       .build();
     return rf.create(BooksService.class);
+  }
+
+  public interface CheckoutService {
+    @POST(CHECKOUT_API)
+    Call<Checkout> create(@Field("checkout[book_id]") String bookId);
+  }
+
+  public static CheckoutService createCheckoutService(URL booksServer, String apiKey) {
+    Retrofit rf = retrofitWithLogging(apiKey)
+      .baseUrl(booksServer.toString())
+      .addConverterFactory(GsonConverterFactory.create())
+      .build();
+    return rf.create(CheckoutService.class);
   }
 
   private static Retrofit.Builder retrofitWithLogging(String apiKey) {
@@ -114,7 +135,7 @@ public class BooksApi {
             }
           });
         String isbn = (String) isbnMap.get("identifier");
-        return new Book(null, isbn, title, authors);
+        return new Book(null, isbn, title, authors, null, null);
       }
     };
   }

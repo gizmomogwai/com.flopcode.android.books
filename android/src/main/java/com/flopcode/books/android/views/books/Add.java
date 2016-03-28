@@ -1,4 +1,4 @@
-package com.flopcode.books.android.views;
+package com.flopcode.books.android.views.books;
 
 import android.app.Activity;
 import android.content.Intent;
@@ -13,12 +13,12 @@ import android.widget.Spinner;
 import android.widget.Toast;
 import butterknife.Bind;
 import butterknife.OnClick;
-import com.flopcode.books.android.BooksApi;
-import com.flopcode.books.android.BooksApi.BooksService;
-import com.flopcode.books.android.BooksApi.IsbnLookupService;
+import com.flopcode.books.BooksApi;
+import com.flopcode.books.BooksApi.BooksService;
+import com.flopcode.books.BooksApi.IsbnLookupService;
 import com.flopcode.books.android.BooksApplication;
 import com.flopcode.books.android.R;
-import com.flopcode.books.android.models.Book;
+import com.flopcode.books.models.Book;
 import com.google.zxing.integration.android.IntentIntegrator;
 import com.google.zxing.integration.android.IntentResult;
 import retrofit2.Call;
@@ -45,9 +45,9 @@ public class Add extends Activity {
   @Override
   protected void onCreate(Bundle savedInstanceState) {
     super.onCreate(savedInstanceState);
-    setContentView(R.layout.activity_add_book);
+    setContentView(R.layout.books_add);
     new IntentIntegrator(this).initiateScan();
-    booksService = BooksApi.createBooksService(BooksApplication.getApiKey(this));
+    booksService = BooksApi.createBooksService("http://localhost:3000", BooksApplication.getApiKey(this));
     isbnLookupService = BooksApi.createIsbnLookupService();
     bind(this);
   }

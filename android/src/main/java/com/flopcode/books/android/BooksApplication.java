@@ -2,6 +2,7 @@ package com.flopcode.books.android;
 
 import android.content.Context;
 import android.content.SharedPreferences;
+import android.widget.Toast;
 
 import static android.content.Context.MODE_PRIVATE;
 
@@ -24,4 +25,9 @@ public class BooksApplication {
   public static void storeApiKey(Context c, String apiKey) {
     getSharedPreferences(c).edit().putString(API_KEY, apiKey).commit();
   }
+
+  public static void toast(Context context, String s) {
+    Toast.makeText(context, s, Toast.LENGTH_LONG).show();
+  }
+
 }

@@ -1,4 +1,4 @@
-package com.flopcode.books.android.views;
+package com.flopcode.books.android.views.books;
 
 import android.app.ActionBar.LayoutParams;
 import android.app.Activity;
@@ -16,11 +16,11 @@ import android.widget.ListView;
 import android.widget.ProgressBar;
 import butterknife.Bind;
 import butterknife.OnItemClick;
-import com.flopcode.books.android.BooksApi;
-import com.flopcode.books.android.BooksApi.BooksService;
+import com.flopcode.books.BooksApi;
+import com.flopcode.books.BooksApi.BooksService;
 import com.flopcode.books.android.BooksApplication;
 import com.flopcode.books.android.R;
-import com.flopcode.books.android.models.Book;
+import com.flopcode.books.models.Book;
 import com.google.zxing.integration.android.IntentIntegrator;
 import com.google.zxing.integration.android.IntentResult;
 import retrofit2.Call;
@@ -44,8 +44,8 @@ public class Index extends Activity {
     super.onCreate(savedInstanceState);
     Log.d(LOG_TAG, "Books.onCreate");
 
-    booksService = BooksApi.createBooksService(BooksApplication.getApiKey(this));
-    setContentView(R.layout.books);
+    booksService = BooksApi.createBooksService("http://localhost:3000", BooksApplication.getApiKey(this));
+    setContentView(R.layout.books_index);
     bind(this);
 
     ProgressBar progressBar = new ProgressBar(this);
@@ -75,7 +75,7 @@ public class Index extends Activity {
 
       @Override
       public void onFailure(Call<List<Book>> call, Throwable throwable) {
-        Show.toast(Index.this, "could not fetch list of books");
+        BooksApplication.toast(Index.this, "could not fetch list of books");
         Log.e(LOG_TAG, "could not fetch list of books", throwable);
       }
     });

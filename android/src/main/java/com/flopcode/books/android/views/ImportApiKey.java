@@ -6,6 +6,7 @@ import android.net.Uri;
 import android.os.Bundle;
 import android.util.Log;
 import com.flopcode.books.android.BooksApplication;
+import com.flopcode.books.android.views.books.Index;
 
 public class ImportApiKey extends Activity {
   @Override

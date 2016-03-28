@@ -1,8 +1,7 @@
-package com.flopcode.books.android.views;
+package com.flopcode.books.android.views.books;
 
 import android.app.Activity;
 import android.app.PendingIntent;
-import android.content.Context;
 import android.content.Intent;
 import android.content.IntentFilter;
 import android.net.Uri;
@@ -15,20 +14,23 @@ import android.os.Bundle;
 import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
+import android.view.View;
 import android.widget.TextView;
-import android.widget.Toast;
 import butterknife.Bind;
 import butterknife.ButterKnife;
-import com.flopcode.books.android.BooksApi;
+import butterknife.OnClick;
+import com.flopcode.books.BooksApi;
+import com.flopcode.books.BooksApi.CheckoutService;
 import com.flopcode.books.android.BooksApplication;
 import com.flopcode.books.android.R;
-import com.flopcode.books.android.models.Book;
+import com.flopcode.books.models.Book;
 import com.google.common.collect.Lists;
 import retrofit2.Call;
 import retrofit2.Callback;
 import retrofit2.Response;
 
 import static com.flopcode.books.android.BooksApplication.LOG_TAG;
+import static com.flopcode.books.android.BooksApplication.toast;
 
 public class Show extends Activity {
 
@@ -54,12 +56,14 @@ public class Show extends Activity {
   TextView owner;
 
   private Book book;
+  private CheckoutService checkoutService;
 
   @Override
   protected void onCreate(Bundle savedInstanceState) {
     super.onCreate(savedInstanceState);
     Log.d(LOG_TAG, "ShowBook.onCreate");
-    setContentView(R.layout.activity_show_book);
+    checkoutService = BooksApi.createCheckoutService(BooksApplication.getApiKey(this));
+    setContentView(R.layout.books_show);
     ButterKnife.bind(this);
 
     final Intent intent = getIntent();
@@ -70,7 +74,7 @@ public class Show extends Activity {
         Log.d(LOG_TAG, "incoming intent: " + uri);
         final String bookId = uri.getPathSegments().get(0);
         Log.d(LOG_TAG, "incoming intent bookId: " + bookId);
-        BooksApi.createBooksService(BooksApplication.getApiKey(this)).show(bookId).enqueue(new Callback<Book>() {
+        BooksApi.createBooksService("http://localhost:3000", BooksApplication.getApiKey(this)).show(bookId).enqueue(new Callback<Book>() {
           @Override
           public void onResponse(Call<Book> call, Response<Book> response) {
             book = response.body();
@@ -96,6 +100,11 @@ public class Show extends Activity {
           .addFlags(Intent.FLAG_ACTIVITY_SINGLE_TOP | Intent.FLAG_ACTIVITY_CLEAR_TOP), 0);
     discovery = new IntentFilter(NfcAdapter.ACTION_TAG_DISCOVERED);
     ndefDetected = new IntentFilter(NfcAdapter.ACTION_NDEF_DISCOVERED);
+  }
+
+  @OnClick(R.id.checkout_checkin_button)
+  public void onCheckoutCheckinButton(View v) {
+    checkoutService.create(book.id);
   }
 
   private void mount(Book book) {
@@ -135,11 +144,6 @@ public class Show extends Activity {
         Log.e(LOG_TAG, "problems", e);
       }
     }
-  }
-
-
-  public static void toast(Context context, String s) {
-    Toast.makeText(context, s, Toast.LENGTH_LONG).show();
   }
 
   @Override

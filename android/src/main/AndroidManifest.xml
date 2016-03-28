@@ -11,7 +11,7 @@
   <application
     android:theme="@android:style/Theme.Material.Light">
     <activity
-      android:name="com.flopcode.books.android.views.Index"
+      android:name=".views.books.Index"
       android:label="@string/title_activity_books">
       <intent-filter>
         <action android:name="android.intent.action.MAIN"/>
@@ -20,21 +20,21 @@
     </activity>
 
     <activity
-      android:name=".views.Add"
+      android:name=".views.books.Add"
       android:label="@string/title_activity_add_book"
-      android:parentActivityName=".views.Index">
+      android:parentActivityName=".views.books.Index">
       <meta-data
         android:name="android.support.PARENT_ACTIVITY"
-        android:value=".views.Index"/>
+        android:value=".views.books.Index"/>
     </activity>
     <activity
-      android:name=".views.Show"
+      android:name=".views.books.Show"
       android:label="@string/title_activity_show_book"
-      android:parentActivityName=".views.Index"
+      android:parentActivityName=".views.books.Index"
       android:launchMode="singleTop">
       <meta-data
         android:name="android.support.PARENT_ACTIVITY"
-        android:value=".views.Index"/>
+        android:value=".views.books.Index"/>
 
       <intent-filter>
         <action android:name="android.nfc.action.NDEF_DISCOVERED"/>
@@ -59,7 +59,7 @@
         />
       </intent-filter>
     </activity>
-    
+
   </application>
 
 </manifest>
