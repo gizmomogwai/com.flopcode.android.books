@@ -41,13 +41,13 @@ public class BooksApi {
   private static final String BLACKBOX = "192.168.1.16";
   public static final String BOOKS_SERVER_IP = FLUNDER_HOME;
   private final static String API = "api/v1";
+
+  //private final static String LOCATIONS_API = API + "/locations";
   private final static String BOOKS_API = API + "/books";
   private final static String CHECKOUT_API = API + "/checkouts";
 
   public interface BooksService {
 
-    //    @GET("users.json")
-    //  Call<List<User>> listUsers();
     @GET(BOOKS_API)
     @Headers("Accept: application/json")
     Call<List<Book>> index();
@@ -55,7 +55,11 @@ public class BooksApi {
     @FormUrlEncoded
     @POST(BOOKS_API)
     @Headers("Accept: application/json")
-    Call<Book> create(@Field("book[isbn]") String isbn, @Field("book[title]") String title, @Field("book[authors]") String authors);
+    Call<Book> create(@Field("book[isbn]") String isbn,
+                      @Field("book[title]") String title,
+                      @Field("book[authors]") String authors,
+                      @Field("book[user_id]") long userId,
+                      @Field("book[location_id]") long locationId);
 
     @GET(BOOKS_API + "/{id}")
     @Headers("Accept: application/json")
@@ -135,7 +139,7 @@ public class BooksApi {
             }
           });
         String isbn = (String) isbnMap.get("identifier");
-        return new Book(null, isbn, title, authors, null, null);
+        return new Book(isbn, title, authors);
       }
     };
   }

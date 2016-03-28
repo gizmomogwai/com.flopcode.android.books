@@ -86,7 +86,7 @@ public class WithBooksServerTest {
     while (true) {
       retry++;
       try {
-        Thread.sleep(5000);
+        Thread.sleep(1000);
         URL u = new URL("http://127.0.0.1:3000/books");
         URLConnection connection = u.openConnection();
         connection.setConnectTimeout(1000);
@@ -110,26 +110,43 @@ public class WithBooksServerTest {
   }
 
   @Test
-  public void testBookIndex() throws Exception {
-    Call<List<Book>> call = BooksApi.createBooksService(new URL("http://127.0.0.1:3000"), "key1").index();
+  public void testBooksIndex() throws Exception {
+    Call<List<Book>> call = BooksApi.createBooksService(new URL("http://127.0.0.1:3000"), "key2").index();
     Response<List<Book>> res = call.execute();
     assertThat(res.body().size()).isEqualTo(2);
   }
 
   @Test
-  public void testBookShow() throws Exception {
-    Call<List<Book>> call1 = BooksApi.createBooksService(new URL("http://127.0.0.1:3000"), "key1").index();
+  public void testBooksShow() throws Exception {
+    Call<List<Book>> call1 = BooksApi.createBooksService(new URL("http://127.0.0.1:3000"), "key2").index();
     String id = call1.execute().body().get(0).id;
 
-    Call<Book> call = BooksApi.createBooksService(new URL("http://127.0.0.1:3000"), "key1").show(id);
+    Call<Book> call = BooksApi.createBooksService(new URL("http://127.0.0.1:3000"), "key2").show(id);
     Response<Book> res = call.execute();
     Book book = res.body();
     assertThat(book.id).isEqualTo("1");
     assertThat(book.isbn).isEqualTo("isbn1");
     assertThat(book.title).isEqualTo("title1");
     assertThat(book.authors).isEqualTo("authors1");
-    assertThat(book.userId).isEqualTo("1");
-    assertThat(book.locationId).isEqualTo("1");
+    assertThat(book.userId).isEqualTo(1);
+    assertThat(book.locationId).isEqualTo(1);
+  }
+
+  @Test
+  public void testBooksCreate() throws Exception {
+    final String isbn = "isbn";
+    final String title = "title";
+    final String authors = "authors";
+    final int userId = 1;
+    final int locationId = 1;
+    Call<Book> call = BooksApi.createBooksService(new URL("http://127.0.0.1:3000"), "key1").create(isbn, title, authors, userId, locationId);
+    Response<Book> response = call.execute();
+    Book result = response.body();
+    assertThat(result.isbn).isEqualTo(isbn);
+    assertThat(result.title).isEqualTo(title);
+    assertThat(result.authors).isEqualTo(authors);
+    assertThat(result.userId).isEqualTo(userId);
+    assertThat(result.locationId).isEqualTo(locationId);
   }
 
 }
