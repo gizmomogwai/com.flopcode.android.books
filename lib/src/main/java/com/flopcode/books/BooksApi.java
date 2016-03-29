@@ -33,6 +33,7 @@ import java.lang.reflect.Type;
 import java.net.URL;
 import java.util.List;
 import java.util.Map;
+import java.util.concurrent.TimeUnit;
 
 public class BooksApi {
 
@@ -94,6 +95,9 @@ public class BooksApi {
     OkHttpClient httpClient = new OkHttpClient.Builder()
       .addInterceptor(logging)
       .addNetworkInterceptor(new AddAuthorizationHeaderInterceptor(apiKey))
+      .connectTimeout(2, TimeUnit.SECONDS)
+      .readTimeout(2, TimeUnit.SECONDS)
+      .writeTimeout(2, TimeUnit.SECONDS)
       .build();
     return new Retrofit.Builder().client(httpClient);
   }
