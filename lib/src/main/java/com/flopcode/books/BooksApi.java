@@ -2,6 +2,7 @@ package com.flopcode.books;
 
 import com.flopcode.books.models.Book;
 import com.flopcode.books.models.Checkout;
+import com.flopcode.books.models.Location;
 import com.google.common.base.Joiner;
 import com.google.common.base.Predicate;
 import com.google.common.collect.Iterables;
@@ -43,9 +44,16 @@ public class BooksApi {
   public static final String BOOKS_SERVER_IP = FLUNDER_HOME;
   private final static String API = "api/v1";
 
-  //private final static String LOCATIONS_API = API + "/locations";
   private final static String BOOKS_API = API + "/books";
+  private final static String LOCATIONS_API = API + "/locations";
   private final static String CHECKOUT_API = API + "/checkouts";
+
+
+  public interface LocationsService {
+    @GET(LOCATIONS_API)
+    @Headers("Accept: application/json")
+    Call<List<Location>> index();
+  }
 
   public interface BooksService {
 
@@ -74,6 +82,15 @@ public class BooksApi {
       .addConverterFactory(GsonConverterFactory.create())
       .build();
     return rf.create(BooksService.class);
+  }
+
+
+  public static LocationsService createLocationsService(URL booksServer, String apiKey) {
+    Retrofit rf = retrofitWithLogging(apiKey)
+      .baseUrl(booksServer.toString())
+      .addConverterFactory(GsonConverterFactory.create())
+      .build();
+    return rf.create(LocationsService.class);
   }
 
   public interface CheckoutService {

@@ -1,15 +1,10 @@
 package com.flopcode.books.android.test;
 
-import com.flopcode.books.BooksApi;
-import com.flopcode.books.models.Book;
 import com.google.common.collect.Lists;
 import org.joda.time.DateTime;
 import org.joda.time.Seconds;
 import org.junit.After;
 import org.junit.Before;
-import org.junit.Test;
-import retrofit2.Call;
-import retrofit2.Response;
 
 import java.io.File;
 import java.io.InputStream;
@@ -17,23 +12,22 @@ import java.lang.reflect.Field;
 import java.net.URL;
 import java.net.URLConnection;
 import java.util.ArrayList;
-import java.util.List;
 import java.util.Scanner;
 
-import static org.assertj.core.api.Assertions.assertThat;
-
-public class WithBooksServerTest {
-  static final String booksServer = "http://127.0.0.1:3000";
+public abstract class WithBooksServerTest {
+  public static final String booksServer = "http://127.0.0.1:3000";
 
   static class Puller extends Thread {
 
+    private final String name;
     private final InputStream stream;
     private final StringBuilder res;
     private final boolean debug;
 
-    public Puller(InputStream stream, StringBuilder res, boolean debug) {
+    public Puller(String name, InputStream stream, boolean debug) {
+      this.name = name;
       this.stream = stream;
-      this.res = res;
+      this.res = new StringBuilder();
       this.debug = debug;
     }
 
@@ -42,8 +36,26 @@ public class WithBooksServerTest {
       while (s.hasNextLine()) {
         String line = s.nextLine();
         if (debug) {
-          System.out.println(" > " + line);
-          res.append(line);
+          System.out.println(name + " > " + line);
+        }
+        res.append(line);
+        res.append("\n");
+      }
+    }
+
+    public String getOutput() {
+      return res.toString();
+    }
+
+    public void waitFor(String s) {
+      if (s == null) return;
+
+      while (!getOutput().contains(s)) {
+        try {
+          System.out.println("Puller(" + name + ").waitFor: " + s);
+          Thread.sleep(1000);
+        } catch (InterruptedException e) {
+          e.printStackTrace();
         }
       }
     }
@@ -51,17 +63,17 @@ public class WithBooksServerTest {
 
   static class AutonomeProcess {
     private final Process process;
-    private final StringBuilder stringBuilder;
     private final Puller stdout;
     private final Puller stderr;
 
-    public AutonomeProcess(Process process, boolean debug) {
+    public AutonomeProcess(Process process, boolean debug, String stdout, String stderr) {
       this.process = process;
-      this.stringBuilder = new StringBuilder();
-      this.stdout = new Puller(this.process.getInputStream(), stringBuilder, debug);
+      this.stdout = new Puller("stdout", this.process.getInputStream(), debug);
       this.stdout.start();
-      this.stderr = new Puller(this.process.getErrorStream(), stringBuilder, debug);
+      this.stderr = new Puller("stderr", this.process.getErrorStream(), debug);
       this.stderr.start();
+      this.stdout.waitFor(stdout);
+      this.stderr.waitFor(stderr);
     }
 
     private long getPid(Process p) throws Exception {
@@ -72,8 +84,9 @@ public class WithBooksServerTest {
       return res;
     }
 
-    private long getPid(Process p, String pattern) throws Exception {
-      String ps = AutonomeProcess.run(new File("."), false, "/bin/ps", "ax").waitFor();
+    private long getPid(String pattern) throws Exception {
+      String ps = AutonomeProcess.run(new File("."), false, null, null, "/bin/ps", "ax").waitFor();
+      System.out.println("ps = " + ps);
       final ArrayList<String> lines = Lists.newArrayList(ps.split("\n"));
       final String[] rails = lines.stream()
         .filter(line -> line.contains(pattern))
@@ -91,7 +104,7 @@ public class WithBooksServerTest {
       return Long.parseLong(pid);
     }
 
-    public static AutonomeProcess run(File workingDirectory, boolean debug, String... command) throws Exception {
+    public static AutonomeProcess run(File workingDirectory, boolean debug, String stdout, String stderr, String... command) throws Exception {
       if (!workingDirectory.exists()) {
         throw new RuntimeException("working directory does not exist");
       }
@@ -99,24 +112,20 @@ public class WithBooksServerTest {
       for (String s : command) {
         System.out.println("s = " + s);
       }
-      return new AutonomeProcess(new ProcessBuilder(command).directory(workingDirectory.getAbsoluteFile()).start(), debug);
+      return new AutonomeProcess(new ProcessBuilder(command).directory(workingDirectory.getAbsoluteFile()).start(), debug, stdout, stderr);
     }
 
-    public String getStdout() {
-      return stdout.res.toString();
-    }
-
-    public String waitFor() throws InterruptedException {
+    public String waitFor() throws Exception {
       process.waitFor();
       stdout.join();
       stderr.join();
-      return getStdout();
+      return stdout.getOutput();
     }
 
     public void destroy() {
       try {
         if (process.isAlive()) {
-          AutonomeProcess.run(new File("."), false, "kill", "-s", "SIGINT", "" + getPid(process, "rails s")).waitFor();
+          AutonomeProcess.run(new File("."), false, null, null, "kill", "-s", "SIGINT", "" + getPid("rails s")).waitFor();
         }
         process.waitFor();
         System.out.println("AutonomeProcess.destroy - finished");
@@ -126,6 +135,7 @@ public class WithBooksServerTest {
       System.out.flush();
       System.err.flush();
     }
+
   }
 
   private AutonomeProcess railsServer;
@@ -133,7 +143,7 @@ public class WithBooksServerTest {
   @Before
   public void setUp() throws Exception {
     System.out.println("WithBooksServerTest.setUp");
-    railsServer = AutonomeProcess.run(new File("../../server"), true, "/Users/gizmo/.rvm/gems/ruby-2.3.0@books/wrappers/rake", "run_testserver");
+    railsServer = AutonomeProcess.run(new File("../../server"), true, null, "WEBrick::HTTPServer#start", "/Users/gizmo/.rvm/gems/ruby-2.3.0@books/wrappers/rake", "run_testserver");
     waitForRailsServer();
   }
 
@@ -177,47 +187,5 @@ public class WithBooksServerTest {
     railsServer.destroy();
   }
 
-  @Test
-  public void testBooksIndex() throws Exception {
-    Call<List<Book>> call = BooksApi.createBooksService(new URL("http://127.0.0.1:3000"), "key2").index();
-    Response<List<Book>> res = call.execute();
-    assertThat(res.body().size()).isEqualTo(2);
-  }
-
-  @Test
-  public void testBooksShow() throws Exception {
-    Call<List<Book>> call1 = BooksApi.createBooksService(new URL(booksServer), "key2").index();
-    String id = call1.execute().body().get(0).id;
-
-    Call<Book> call = BooksApi.createBooksService(new URL(booksServer), "key2").show(id);
-    Response<Book> res = call.execute();
-    Book book = res.body();
-    assertThat(book.id).isEqualTo("1");
-    assertThat(book.isbn).isEqualTo("isbn1");
-    assertThat(book.title).isEqualTo("title1");
-    assertThat(book.authors).isEqualTo("authors1");
-    assertThat(book.userId).isEqualTo(1);
-    assertThat(book.locationId).isEqualTo(1);
-  }
-
-
-  @Test
-  public void testBooksCreate() throws Exception {
-    final String isbn = "isbn";
-    final String title = "title";
-    final String authors = "authors";
-    final int userId = 1;
-    final int locationId = 1;
-
-
-    Call<Book> call = BooksApi.createBooksService(new URL(booksServer), "key1").create(isbn, title, authors, userId, locationId);
-    Response<Book> response = call.execute();
-    Book result = response.body();
-    assertThat(result.isbn).isEqualTo(isbn);
-    assertThat(result.title).isEqualTo(title);
-    assertThat(result.authors).isEqualTo(authors);
-    assertThat(result.userId).isEqualTo(userId);
-    assertThat(result.locationId).isEqualTo(locationId);
-  }
 
 }
