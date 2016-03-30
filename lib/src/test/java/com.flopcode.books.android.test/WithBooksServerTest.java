@@ -155,7 +155,6 @@ public abstract class WithBooksServerTest {
     while (true) {
       retry++;
       try {
-        Thread.sleep(1000);
         URL u = new URL("http://127.0.0.1:3000/books");
 
         URLConnection connection = u.openConnection();
@@ -177,6 +176,11 @@ public abstract class WithBooksServerTest {
       Seconds i = Seconds.secondsBetween(startTime, DateTime.now());
       if (i.isGreaterThan(Seconds.seconds(15))) {
         return;
+      }
+      try {
+        Thread.sleep(1000);
+      } catch (InterruptedException e) {
+        e.printStackTrace();
       }
     }
   }

@@ -32,7 +32,6 @@ import java.io.IOException;
 import java.io.StringReader;
 import java.lang.annotation.Annotation;
 import java.lang.reflect.Type;
-import java.net.URL;
 import java.util.List;
 import java.util.Map;
 import java.util.concurrent.TimeUnit;
@@ -49,7 +48,6 @@ public class BooksApi {
   private final static String LOCATIONS_API = API + "/locations";
   private final static String CHECKOUT_API = API + "/checkouts";
   private final static String USERS_API = API + "/users";
-
 
 
   public interface UsersService {
@@ -85,25 +83,26 @@ public class BooksApi {
 
   }
 
-  public static BooksService createBooksService(URL booksServer, String apiKey) {
+  public static BooksService createBooksService(String url, String apiKey) {
     Retrofit rf = retrofitWithLogging(apiKey)
-      .baseUrl(booksServer.toString())
+      .baseUrl(url)
       .addConverterFactory(GsonConverterFactory.create())
       .build();
     return rf.create(BooksService.class);
   }
 
-  public static UsersService createUsersService(URL url, String apiKey) {
+  public static UsersService createUsersService(String url, String apiKey) {
     Retrofit rf = retrofitWithLogging(apiKey)
-      .baseUrl(url.toString())
+      .baseUrl(url)
       .addConverterFactory(GsonConverterFactory.create())
       .build();
     return rf.create(UsersService.class);
 
   }
-  public static LocationsService createLocationsService(URL booksServer, String apiKey) {
+
+  public static LocationsService createLocationsService(String url, String apiKey) {
     Retrofit rf = retrofitWithLogging(apiKey)
-      .baseUrl(booksServer.toString())
+      .baseUrl(url)
       .addConverterFactory(GsonConverterFactory.create())
       .build();
     return rf.create(LocationsService.class);
@@ -114,9 +113,9 @@ public class BooksApi {
     Call<Checkout> create(@Field("checkout[book_id]") String bookId);
   }
 
-  public static CheckoutService createCheckoutService(URL booksServer, String apiKey) {
+  public static CheckoutService createCheckoutService(String url, String apiKey) {
     Retrofit rf = retrofitWithLogging(apiKey)
-      .baseUrl(booksServer.toString())
+      .baseUrl(url)
       .addConverterFactory(GsonConverterFactory.create())
       .build();
     return rf.create(CheckoutService.class);

@@ -6,7 +6,6 @@ import org.junit.Test;
 import retrofit2.Call;
 import retrofit2.Response;
 
-import java.net.URL;
 import java.util.List;
 
 import static org.assertj.core.api.Assertions.assertThat;
@@ -15,7 +14,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 public class UsersIntegrationTest extends WithBooksServerTest {
   @Test
   public void usersIndexTest() throws Exception {
-    Call<List<User>> call = BooksApi.createUsersService(new URL(booksServer), "key1").index();
+    Call<List<User>> call = BooksApi.createUsersService(booksServer, "key1").index();
     Response<List<User>> response = call.execute();
     List<User> users = response.body();
     assertThat(users).hasSize(2);

@@ -6,7 +6,6 @@ import org.junit.Test;
 import retrofit2.Call;
 import retrofit2.Response;
 
-import java.net.URL;
 import java.util.List;
 
 import static org.assertj.core.api.Assertions.assertThat;
@@ -14,7 +13,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 public class LocationsIntegrationTest extends WithBooksServerTest {
   @Test
   public void testLocationsIndex() throws Exception {
-    Call<List<Location>> call = BooksApi.createLocationsService(new URL(booksServer), "key1").index();
+    Call<List<Location>> call = BooksApi.createLocationsService(booksServer, "key1").index();
     Response<List<Location>> res = call.execute();
     List<Location> locations = res.body();
     assertThat(locations).hasSize(2);
