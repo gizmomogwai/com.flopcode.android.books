@@ -3,6 +3,7 @@ package com.flopcode.books;
 import com.flopcode.books.models.Book;
 import com.flopcode.books.models.Checkout;
 import com.flopcode.books.models.Location;
+import com.flopcode.books.models.User;
 import com.google.common.base.Joiner;
 import com.google.common.base.Predicate;
 import com.google.common.collect.Iterables;
@@ -47,7 +48,15 @@ public class BooksApi {
   private final static String BOOKS_API = API + "/books";
   private final static String LOCATIONS_API = API + "/locations";
   private final static String CHECKOUT_API = API + "/checkouts";
+  private final static String USERS_API = API + "/users";
 
+
+
+  public interface UsersService {
+    @GET(USERS_API)
+    @Headers("Accept: application/json")
+    Call<List<User>> index();
+  }
 
   public interface LocationsService {
     @GET(LOCATIONS_API)
@@ -84,7 +93,14 @@ public class BooksApi {
     return rf.create(BooksService.class);
   }
 
+  public static UsersService createUsersService(URL url, String apiKey) {
+    Retrofit rf = retrofitWithLogging(apiKey)
+      .baseUrl(url.toString())
+      .addConverterFactory(GsonConverterFactory.create())
+      .build();
+    return rf.create(UsersService.class);
 
+  }
   public static LocationsService createLocationsService(URL booksServer, String apiKey) {
     Retrofit rf = retrofitWithLogging(apiKey)
       .baseUrl(booksServer.toString())
