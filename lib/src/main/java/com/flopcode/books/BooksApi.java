@@ -1,5 +1,6 @@
 package com.flopcode.books;
 
+import com.flopcode.books.models.ActiveCheckout;
 import com.flopcode.books.models.Book;
 import com.flopcode.books.models.Checkout;
 import com.flopcode.books.models.Location;
@@ -20,6 +21,7 @@ import retrofit2.Converter;
 import retrofit2.Converter.Factory;
 import retrofit2.Retrofit;
 import retrofit2.converter.gson.GsonConverterFactory;
+import retrofit2.http.DELETE;
 import retrofit2.http.Field;
 import retrofit2.http.FormUrlEncoded;
 import retrofit2.http.GET;
@@ -46,7 +48,7 @@ public class BooksApi {
 
   private final static String BOOKS_API = API + "/books";
   private final static String LOCATIONS_API = API + "/locations";
-  private final static String CHECKOUT_API = API + "/checkouts";
+  private final static String ACTIVE_CHECKOUTS_API = API + "/active_checkouts";
   private final static String USERS_API = API + "/users";
 
 
@@ -108,17 +110,23 @@ public class BooksApi {
     return rf.create(LocationsService.class);
   }
 
-  public interface CheckoutService {
-    @POST(CHECKOUT_API)
-    Call<Checkout> create(@Field("checkout[book_id]") String bookId);
+  public interface ActiveCheckoutsService {
+    @FormUrlEncoded
+    @POST(ACTIVE_CHECKOUTS_API)
+    @Headers("Accept: application/json")
+    Call<ActiveCheckout> create(@Field("book") String bookId);
+
+    @DELETE(ACTIVE_CHECKOUTS_API + "/{id}")
+    @Headers("Accept: application/json")
+    Call<Void> destroy(@Path("id") String activeCheckoutId);
   }
 
-  public static CheckoutService createCheckoutService(String url, String apiKey) {
+  public static ActiveCheckoutsService createActiveCheckoutsService(String url, String apiKey) {
     Retrofit rf = retrofitWithLogging(apiKey)
       .baseUrl(url)
       .addConverterFactory(GsonConverterFactory.create())
       .build();
-    return rf.create(CheckoutService.class);
+    return rf.create(ActiveCheckoutsService.class);
   }
 
   private static Retrofit.Builder retrofitWithLogging(String apiKey) {

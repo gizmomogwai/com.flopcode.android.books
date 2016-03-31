@@ -16,7 +16,8 @@ public class BooksIntegrationTest extends WithBooksServerTest {
   public void testBooksIndex() throws Exception {
     Call<List<Book>> call = BooksApi.createBooksService(booksServer, "key2").index();
     Response<List<Book>> res = call.execute();
-    assertThat(res.body().size()).isEqualTo(2);
+    final List<Book> books = res.body();
+    assertThat(books.size()).isEqualTo(2);
   }
 
   @Test

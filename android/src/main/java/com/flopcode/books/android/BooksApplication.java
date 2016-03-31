@@ -8,7 +8,8 @@ import static android.content.Context.MODE_PRIVATE;
 
 public class BooksApplication {
   public static final String LOG_TAG = "Books";
-  public static final String API_KEY = "api-key";
+  private static final String API_KEY = "api-key";
+  private static final String BOOKS_SERVER = "books-server";
 
   private static String getPreference(Context c, String s) {
     return getSharedPreferences(c).getString(s, null);
@@ -20,6 +21,10 @@ public class BooksApplication {
 
   public static String getApiKey(Context c) {
     return getPreference(c, API_KEY);
+  }
+
+  public static String getBooksServer(Context c) {
+    return getPreference(c, BOOKS_SERVER);
   }
 
   public static void storeApiKey(Context c, String apiKey) {

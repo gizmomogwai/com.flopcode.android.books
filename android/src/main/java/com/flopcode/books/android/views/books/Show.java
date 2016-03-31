@@ -62,7 +62,7 @@ public class Show extends Activity {
   protected void onCreate(Bundle savedInstanceState) {
     super.onCreate(savedInstanceState);
     Log.d(LOG_TAG, "ShowBook.onCreate");
-    checkoutService = BooksApi.createCheckoutService(BooksApplication.getApiKey(this));
+    checkoutService = BooksApi.createActiveCheckoutsService(BooksApplication.getBooksServer(this), BooksApplication.getApiKey(this));
     setContentView(R.layout.books_show);
     ButterKnife.bind(this);
 
@@ -74,7 +74,7 @@ public class Show extends Activity {
         Log.d(LOG_TAG, "incoming intent: " + uri);
         final String bookId = uri.getPathSegments().get(0);
         Log.d(LOG_TAG, "incoming intent bookId: " + bookId);
-        BooksApi.createBooksService("http://localhost:3000", BooksApplication.getApiKey(this)).show(bookId).enqueue(new Callback<Book>() {
+        BooksApi.createBooksService(BooksApplication.getBooksServer(this), BooksApplication.getApiKey(this)).show(bookId).enqueue(new Callback<Book>() {
           @Override
           public void onResponse(Call<Book> call, Response<Book> response) {
             book = response.body();

@@ -45,7 +45,7 @@ public class Index extends Activity {
     super.onCreate(savedInstanceState);
     Log.d(LOG_TAG, "Books.onCreate");
 
-    booksService = BooksApi.createBooksService("http://localhost:3000", BooksApplication.getApiKey(this));
+    booksService = BooksApi.createBooksService(BooksApplication.getBooksServer(this), BooksApplication.getApiKey(this));
     setContentView(R.layout.books_index);
     bind(this);
 

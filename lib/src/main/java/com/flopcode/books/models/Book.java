@@ -13,18 +13,21 @@ public class Book implements Serializable {
   public final long userId;
   @SerializedName("location_id")
   public final long locationId;
+  @SerializedName("active_checkout_id")
+  public final long activeCheckout;
 
-  public Book(String id, String isbn, String title, String authors, long user, long location) {
+  public Book(String id, String isbn, String title, String authors, long user, long location, long activeCheckout) {
     this.id = id;
     this.isbn = isbn;
     this.title = title;
     this.authors = authors;
     this.userId = user;
     this.locationId = location;
+    this.activeCheckout = activeCheckout;
   }
 
   public Book(String isbn, String title, String authors) {
-    this(null, isbn, title, authors, -1, -1);
+    this(null, isbn, title, authors, -1, -1, -1);
   }
 
   @Override
