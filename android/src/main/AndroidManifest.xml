@@ -9,7 +9,8 @@
     android:name="android.permission.NFC"/>
 
   <application
-    android:theme="@style/Theme.AppCompat.Light">
+    android:name="com.flopcode.books.android.BooksApplication"
+    android:theme="@style/Theme.AppCompat.DayNight">
     <activity
       android:name=".views.books.Index"
       android:label="@string/title_activity_books">
@@ -35,7 +36,7 @@
     <activity
       android:name=".views.books.Show"
       android:label="@string/title_activity_show_book"
-      android:parentActivityName=".views.books.Index"
+      android:parentActivityName="com.flopcode.books.android.views.books.Index"
       android:launchMode="singleTop">
       <meta-data
         android:name="android.support.PARENT_ACTIVITY"
@@ -60,8 +61,7 @@
         <category
           android:name="android.intent.category.BROWSABLE"/>
         <data
-          android:scheme="books-api-key"
-        />
+          android:scheme="books-api-key"/>
       </intent-filter>
     </activity>
 

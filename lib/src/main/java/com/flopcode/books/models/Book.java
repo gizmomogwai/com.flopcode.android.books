@@ -14,7 +14,7 @@ public class Book implements Serializable {
   @SerializedName("location_id")
   public final long locationId;
   @SerializedName("active_checkout_id")
-  public final long activeCheckout;
+  public long activeCheckout;
 
   public Book(String id, String isbn, String title, String authors, long user, long location, long activeCheckout) {
     this.id = id;

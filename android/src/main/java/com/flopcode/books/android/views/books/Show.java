@@ -1,6 +1,5 @@
 package com.flopcode.books.android.views.books;
 
-import android.app.Activity;
 import android.app.PendingIntent;
 import android.content.Intent;
 import android.content.IntentFilter;
@@ -11,10 +10,13 @@ import android.nfc.NfcAdapter;
 import android.nfc.Tag;
 import android.nfc.tech.Ndef;
 import android.os.Bundle;
+import android.support.v4.app.NavUtils;
+import android.support.v7.app.AppCompatActivity;
 import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
+import android.widget.Button;
 import android.widget.TextView;
 import butterknife.Bind;
 import butterknife.ButterKnife;
@@ -23,6 +25,7 @@ import com.flopcode.books.BooksApi;
 import com.flopcode.books.BooksApi.ActiveCheckoutsService;
 import com.flopcode.books.android.BooksApplication;
 import com.flopcode.books.android.R;
+import com.flopcode.books.models.ActiveCheckout;
 import com.flopcode.books.models.Book;
 import com.google.common.collect.Lists;
 import retrofit2.Call;
@@ -30,8 +33,9 @@ import retrofit2.Callback;
 import retrofit2.Response;
 
 import static com.flopcode.books.android.BooksApplication.LOG_TAG;
+import static com.flopcode.books.android.BooksApplication.showError;
 
-public class Show extends Activity {
+public class Show extends AppCompatActivity {
 
   private static final int TAG_DETECTED = 17;
   private NfcAdapter nfcAdapter;
@@ -54,12 +58,17 @@ public class Show extends Activity {
   @Bind(R.id.book_owner)
   TextView owner;
 
+  @Bind(R.id.checkout_checkin_button)
+  Button checkoutCheckinButton;
+
   private Book book;
+
   private ActiveCheckoutsService checkoutsService;
 
   @Override
   protected void onCreate(Bundle savedInstanceState) {
     super.onCreate(savedInstanceState);
+
     Log.d(LOG_TAG, "ShowBook.onCreate");
     checkoutsService = BooksApi.createActiveCheckoutsService(BooksApplication.getBooksServer(this), BooksApplication.getApiKey(this));
     setContentView(R.layout.books_show);
@@ -82,7 +91,7 @@ public class Show extends Activity {
 
           @Override
           public void onFailure(Call<Book> call, Throwable throwable) {
-            //showError(Show.this, "could not fetch book data for bookId " + bookId);
+            showError(Show.this, "could not fetch book data for bookId " + bookId);
           }
         });
       }
@@ -103,15 +112,69 @@ public class Show extends Activity {
 
   @OnClick(R.id.checkout_checkin_button)
   public void onCheckoutCheckinButton(View v) {
-    checkoutsService.create(book.id);
+    System.out.println("Show.onCheckoutCheckinButton");
+    System.out.println("book.activeCheckout = " + book.activeCheckout);
+    if (book.activeCheckout == 0) {
+      checkoutsService.create(book.id).enqueue(new Callback<ActiveCheckout>() {
+        @Override
+        public void onResponse(Call<ActiveCheckout> call, Response<ActiveCheckout> response) {
+          checkoutCreated(response.body());
+        }
+
+        @Override
+        public void onFailure(Call<ActiveCheckout> call, Throwable t) {
+          showError(Show.this, "could not checkout book");
+        }
+      });
+    } else {
+      if (ownUserId(book.userId)) {
+        checkoutsService.destroy("" + book.activeCheckout).enqueue(new Callback<Void>() {
+          @Override
+          public void onResponse(Call<Void> call, Response<Void> response) {
+            activeCheckoutDestroyed();
+          }
+
+          @Override
+          public void onFailure(Call<Void> call, Throwable t) {
+            showError(Show.this, "could not checkin book");
+          }
+        });
+      }
+    }
+  }
+
+  private void activeCheckoutDestroyed() {
+    runOnUiThread(new Runnable() {
+      @Override
+      public void run() {
+        book.activeCheckout = 0;
+        mount(book);
+      }
+    });
+  }
+
+  private void checkoutCreated(final ActiveCheckout body) {
+    runOnUiThread(new Runnable() {
+      @Override
+      public void run() {
+        book.activeCheckout = Long.parseLong(body.id);
+        mount(book);
+      }
+    });
+  }
+
+  private boolean ownUserId(long userId) {
+    return true;
   }
 
   private void mount(Book book) {
+    this.book = book;
     id.setText("nyi");//book.id);
     isbn.setText(book.isbn);
     title.setText(book.title);
     authors.setText(book.authors);
     owner.setText("nyi");
+    checkoutCheckinButton.setText(book.activeCheckout == 0 ? "Checkout" : "Checkin");
   }
 
   @Override
@@ -119,7 +182,7 @@ public class Show extends Activity {
     super.onResume();
     Log.d(LOG_TAG, "ShowBook.onResume");
     if (!nfcAdapter.isEnabled()) {
-      //showError(this, "please enable nfc");
+      showError(this, "please enable nfc");
     }
   }
 
@@ -133,13 +196,13 @@ public class Show extends Activity {
         Ndef ndef = Ndef.get(detectedTag);
         ndef.connect();
         if (!ndef.isWritable()) {
-          //showError(this, "not writeable");
+          showError(this, "not writeable");
           return;
         }
         NdefMessage message = new NdefMessage(new NdefRecord[]{NdefRecord.createUri("books:///1")});
         ndef.writeNdefMessage(message);
       } catch (Exception e) {
-        //showError(this, "problems " + e.getMessage());
+        showError(this, "problems " + e.getMessage());
         Log.e(LOG_TAG, "problems", e);
       }
     }
@@ -157,16 +220,18 @@ public class Show extends Activity {
     return true;
   }
 
-
   @Override
-  public boolean onMenuItemSelected(int featureId, MenuItem item) {
+  public boolean onOptionsItemSelected(MenuItem item) {
     switch (item.getItemId()) {
+      case android.R.id.home:
+        NavUtils.navigateUpFromSameTask(this);
+        return true;
       case R.id.action_write_tag_to_book:
         nfcAdapter.enableForegroundDispatch(this, pendingIntent, new IntentFilter[]{discovery}, null);
-        //showError(this, "approach tag now");
+        showError(this, "approach tag now");
         break;
       case R.id.action_checkout_book:
-        //showError(this, "trying to get the book");
+        showError(this, "trying to get the book");
         break;
     }
     return true;
