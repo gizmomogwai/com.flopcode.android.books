@@ -1,5 +1,7 @@
 package com.flopcode.books.android.test;
 
+import com.google.common.collect.Collections2;
+import com.google.common.collect.Iterables;
 import com.google.common.collect.Lists;
 import org.joda.time.DateTime;
 import org.joda.time.Seconds;
@@ -12,7 +14,10 @@ import java.lang.reflect.Field;
 import java.net.URL;
 import java.net.URLConnection;
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.Scanner;
+import java.util.function.Function;
+import java.util.function.Predicate;
 
 public abstract class WithBooksServerTest {
   public static final String booksServer = "http://127.0.0.1:3000";
@@ -84,20 +89,57 @@ public abstract class WithBooksServerTest {
       return res;
     }
 
-    private long getPid(String pattern) throws Exception {
+    private long getPid(final String pattern) throws Exception {
       String ps = AutonomeProcess.run(new File("."), false, null, null, "/bin/ps", "ax").waitFor();
       System.out.println("ps = " + ps);
       final ArrayList<String> lines = Lists.newArrayList(ps.split("\n"));
+      final String[] rails = Collections2.filter(lines, new com.google.common.base.Predicate<String>() {
+        @Override
+        public boolean apply(String input) {
+          return input.contains(pattern);
+        }
+      }).iterator().next().split(" ");
+      /*
       final String[] rails = lines.stream()
-        .filter(line -> line.contains(pattern))
+        .filter(new Predicate<String>() {
+          @Override
+          public boolean test(String s) {
+            return s.contains(pattern);
+          }
+        })
         .findFirst()
         .get()
         .split(" ");
+        */
+      Collection<String> pids = Collections2.transform(Lists.newArrayList(rails), new com.google.common.base.Function<String, String>() {
+        @Override
+        public String apply(String input) {
+          return input.trim();
+        }
+      });
+      String pid = Collections2.filter(pids, new com.google.common.base.Predicate<String>() {
+        @Override
+        public boolean apply(String input) {
+          return input.length() > 0;
+        }
+      }).iterator().next();
+      /*
       String pid = Lists.newArrayList(rails)
         .stream()
-        .map(line -> line.trim())
-        .filter(line -> line.trim().length() > 0).findFirst().get();
-      System.out.println("pid = " + pid);
+        .map(new Function<String, String>() {
+          @Override
+          public String apply(String s) {
+            return s.trim();
+          }
+        })
+        .filter(new Predicate<String>() {
+          @Override
+          public boolean test(String line) {
+            return line.length() > 0;
+          }
+        }).findFirst().get();
+        */
+        System.out.println("pid = " + pid);
       if (pid == null || pid.length() == 0) {
         throw new RuntimeException("could not determine pid of rails app");
       }

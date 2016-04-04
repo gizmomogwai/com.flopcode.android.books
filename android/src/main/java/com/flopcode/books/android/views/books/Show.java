@@ -20,7 +20,7 @@ import butterknife.Bind;
 import butterknife.ButterKnife;
 import butterknife.OnClick;
 import com.flopcode.books.BooksApi;
-import com.flopcode.books.BooksApi.CheckoutService;
+import com.flopcode.books.BooksApi.ActiveCheckoutsService;
 import com.flopcode.books.android.BooksApplication;
 import com.flopcode.books.android.R;
 import com.flopcode.books.models.Book;
@@ -30,7 +30,6 @@ import retrofit2.Callback;
 import retrofit2.Response;
 
 import static com.flopcode.books.android.BooksApplication.LOG_TAG;
-import static com.flopcode.books.android.BooksApplication.toast;
 
 public class Show extends Activity {
 
@@ -56,13 +55,13 @@ public class Show extends Activity {
   TextView owner;
 
   private Book book;
-  private CheckoutService checkoutService;
+  private ActiveCheckoutsService checkoutsService;
 
   @Override
   protected void onCreate(Bundle savedInstanceState) {
     super.onCreate(savedInstanceState);
     Log.d(LOG_TAG, "ShowBook.onCreate");
-    checkoutService = BooksApi.createActiveCheckoutsService(BooksApplication.getBooksServer(this), BooksApplication.getApiKey(this));
+    checkoutsService = BooksApi.createActiveCheckoutsService(BooksApplication.getBooksServer(this), BooksApplication.getApiKey(this));
     setContentView(R.layout.books_show);
     ButterKnife.bind(this);
 
@@ -83,7 +82,7 @@ public class Show extends Activity {
 
           @Override
           public void onFailure(Call<Book> call, Throwable throwable) {
-            toast(Show.this, "could not fetch book data for bookId " + bookId);
+            //showError(Show.this, "could not fetch book data for bookId " + bookId);
           }
         });
       }
@@ -104,7 +103,7 @@ public class Show extends Activity {
 
   @OnClick(R.id.checkout_checkin_button)
   public void onCheckoutCheckinButton(View v) {
-    checkoutService.create(book.id);
+    checkoutsService.create(book.id);
   }
 
   private void mount(Book book) {
@@ -120,7 +119,7 @@ public class Show extends Activity {
     super.onResume();
     Log.d(LOG_TAG, "ShowBook.onResume");
     if (!nfcAdapter.isEnabled()) {
-      toast(this, "please enable nfc");
+      //showError(this, "please enable nfc");
     }
   }
 
@@ -134,13 +133,13 @@ public class Show extends Activity {
         Ndef ndef = Ndef.get(detectedTag);
         ndef.connect();
         if (!ndef.isWritable()) {
-          toast(this, "not writeable");
+          //showError(this, "not writeable");
           return;
         }
         NdefMessage message = new NdefMessage(new NdefRecord[]{NdefRecord.createUri("books:///1")});
         ndef.writeNdefMessage(message);
       } catch (Exception e) {
-        toast(this, "problems " + e.getMessage());
+        //showError(this, "problems " + e.getMessage());
         Log.e(LOG_TAG, "problems", e);
       }
     }
@@ -164,10 +163,10 @@ public class Show extends Activity {
     switch (item.getItemId()) {
       case R.id.action_write_tag_to_book:
         nfcAdapter.enableForegroundDispatch(this, pendingIntent, new IntentFilter[]{discovery}, null);
-        toast(this, "approach tag now");
+        //showError(this, "approach tag now");
         break;
       case R.id.action_checkout_book:
-        toast(this, "trying to get the book");
+        //showError(this, "trying to get the book");
         break;
     }
     return true;

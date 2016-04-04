@@ -2,7 +2,6 @@ package com.flopcode.books;
 
 import com.flopcode.books.models.ActiveCheckout;
 import com.flopcode.books.models.Book;
-import com.flopcode.books.models.Checkout;
 import com.flopcode.books.models.Location;
 import com.flopcode.books.models.User;
 import com.google.common.base.Joiner;

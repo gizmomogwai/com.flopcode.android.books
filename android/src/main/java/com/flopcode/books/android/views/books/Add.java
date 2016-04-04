@@ -59,8 +59,8 @@ public class Add extends Activity {
 
   @OnClick(R.id.ok_button)
   public void onAddButton(View v) {
-    Book b = new Book(null, isbn.getText().toString(), title.getText().toString(), authors.getText().toString());
-    booksService.create(b.isbn, b.title, b.authors).enqueue(new Callback<Book>() {
+    Book b = new Book(isbn.getText().toString(), title.getText().toString(), authors.getText().toString());
+    booksService.create(b.isbn, b.title, b.authors, -1, -1).enqueue(new Callback<Book>() {
       @Override
       public void onResponse(Call<Book> call, Response<Book> response) {
         if (response.isSuccess()) {

@@ -1,33 +1,30 @@
 package com.flopcode.books.android.views.books;
 
-import android.app.ActionBar.LayoutParams;
 import android.app.Activity;
 import android.content.Intent;
 import android.net.Uri;
 import android.os.Bundle;
+import android.support.v7.widget.RecyclerView;
 import android.util.Log;
-import android.view.Gravity;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
-import android.widget.AdapterView;
-import android.widget.ArrayAdapter;
-import android.widget.ListView;
-import android.widget.ProgressBar;
 import butterknife.Bind;
-import butterknife.OnItemClick;
 import com.flopcode.books.BooksApi;
 import com.flopcode.books.BooksApi.BooksService;
+import com.flopcode.books.BooksApi.LocationsService;
+import com.flopcode.books.BooksApi.UsersService;
 import com.flopcode.books.android.BooksApplication;
 import com.flopcode.books.android.R;
+import com.flopcode.books.android.views.PreferencesActivity;
 import com.flopcode.books.models.Book;
+import com.flopcode.books.models.Location;
 import com.google.zxing.integration.android.IntentIntegrator;
 import com.google.zxing.integration.android.IntentResult;
 import retrofit2.Call;
 import retrofit2.Callback;
 import retrofit2.Response;
 
-import java.net.URL;
 import java.util.List;
 
 import static butterknife.ButterKnife.bind;
@@ -36,51 +33,158 @@ import static com.flopcode.books.android.BooksApplication.LOG_TAG;
 public class Index extends Activity {
 
   private BooksService booksService;
+  private UsersService usersService;
 
-  @Bind(R.id.listView)
-  ListView books;
+  List<Book> books;
+
+  @Bind(R.id.recycler_view)
+  RecyclerView booksList;
+
+  private LocationsService locationsService;
+  private List<com.flopcode.books.models.User> users;
+  private List<Location> locations;
 
   @Override
   protected void onCreate(Bundle savedInstanceState) {
     super.onCreate(savedInstanceState);
+
     Log.d(LOG_TAG, "Books.onCreate");
 
     booksService = BooksApi.createBooksService(BooksApplication.getBooksServer(this), BooksApplication.getApiKey(this));
+    usersService = BooksApi.createUsersService(BooksApplication.getBooksServer(this), BooksApplication.getApiKey(this));
+    locationsService = BooksApi.createLocationsService(BooksApplication.getBooksServer(this), BooksApplication.getApiKey(this));
+
     setContentView(R.layout.books_index);
     bind(this);
 
-    ProgressBar progressBar = new ProgressBar(this);
-    progressBar.setLayoutParams(new LayoutParams(LayoutParams.WRAP_CONTENT, LayoutParams.WRAP_CONTENT, Gravity.CENTER));
-    progressBar.setIndeterminate(true);
-    this.books.setEmptyView(progressBar);
-  }
-
-  @OnItemClick(R.id.listView)
-  public void showBook(AdapterView<?> parent, View view, int position, long id) {
-    Book book = (Book) books.getAdapter().getItem(position);
-    startActivity(new Intent(Index.this, Show.class).putExtra("book", book));
+    //booksList.setVisibility(GONE);
   }
 
   @Override
   protected void onResume() {
     super.onResume();
     Log.d(LOG_TAG, "Books.onResume");
-    booksService.index().enqueue(new Callback<List<Book>>() {
+    //progressDescription.setText("fetching data from server");
+
+    fetchBooks();
+    fetchUsers();
+    fetchLocations();
+  }
+
+  private void fetchLocations() {
+    locationsService.index().enqueue(new Callback<List<Location>>() {
       @Override
-      public void onResponse(Call<List<Book>> call, Response<List<Book>> response) {
-        List<Book> listOfBooks = response.body();
-        final ArrayAdapter<Book> adapter = new ArrayAdapter<>(Index.this, android.R.layout.simple_list_item_1);
-        adapter.addAll(listOfBooks);
-        books.setAdapter(adapter);
+      public void onResponse(Call<List<Location>> call, final Response<List<Location>> response) {
+        runOnUiThread(new Runnable() {
+          @Override
+          public void run() {
+            //progressDescription.setText("got locations");
+            setLocations(response.body());
+          }
+        });
       }
 
       @Override
-      public void onFailure(Call<List<Book>> call, Throwable throwable) {
-        BooksApplication.toast(Index.this, "could not fetch list of books");
-        Log.e(LOG_TAG, "could not fetch list of books", throwable);
+      public void onFailure(Call<List<Location>> call, Throwable t) {
+        signalError("could not fetch locations", t);
       }
     });
   }
+
+  private void signalError(final String msg, final Throwable throwable) {
+    runOnUiThread(new Runnable() {
+      @Override
+      public void run() {
+        BooksApplication.showError(findViewById(R.id.coordinatorLayout), msg, "settings", new View.OnClickListener() {
+          @Override
+          public void onClick(View v) {
+            startActivity(new Intent(Index.this, PreferencesActivity.class));
+          }
+        });
+        Log.e(LOG_TAG, msg, throwable);
+      }
+    });
+
+  }
+
+  private void setLocations(List<Location> locations) {
+    this.locations = locations;
+  }
+
+  private void fetchUsers() {
+    usersService.index().enqueue(new Callback<List<com.flopcode.books.models.User>>() {
+
+      @Override
+      public void onResponse(Call<List<com.flopcode.books.models.User>> call, final Response<List<com.flopcode.books.models.User>> response) {
+        runOnUiThread(new Runnable() {
+          @Override
+          public void run() {
+            //progressDescription.setText("got users");
+            setUsers(response.body());
+          }
+        });
+      }
+
+      @Override
+      public void onFailure(Call<List<com.flopcode.books.models.User>> call, final Throwable throwable) {
+        signalError("could not fetch users", throwable);
+      }
+    });
+  }
+
+  private void fetchBooks() {
+    booksService.index().enqueue(new Callback<List<Book>>() {
+      @Override
+      public void onResponse(Call<List<Book>> call, final Response<List<Book>> response) {
+        runOnUiThread(new Runnable() {
+          @Override
+          public void run() {
+            //progressDescription.setText("got books");
+            setBooks(response.body());
+          }
+        });
+      }
+
+      @Override
+      public void onFailure(Call<List<Book>> call, final Throwable throwable) {
+        signalError("could not fetch list of books", throwable);
+      }
+    });
+  }
+
+  private void setUsers(List<com.flopcode.books.models.User> users) {
+    this.users = users;
+    updateUi();
+  }
+
+  private void setBooks(List<Book> books) {
+    this.books = books;
+    updateUi();
+  }
+
+  private void updateUi() {
+    if (fetchDataComplete()) {
+      switchToRealUI();
+    }
+  }
+
+  private void switchToRealUI() {
+    //progress.setVisibility(GONE);
+    //booksList.setVisibility(View.VISIBLE);
+  }
+
+  private boolean fetchDataComplete() {
+    return books != null;
+  }
+
+
+  /*
+  @OnItemClick(R.id.listView)
+  public void showBook(AdapterView<?> parent, View view, int position, long id) {
+    Book book = (Book) books.getAdapter().getItem(position);
+    startActivity(new Intent(Index.this, Show.class).putExtra("book", book));
+  }
+*/
 
   @Override
   public boolean onCreateOptionsMenu(Menu menu) {

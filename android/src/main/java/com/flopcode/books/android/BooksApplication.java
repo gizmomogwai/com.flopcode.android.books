@@ -2,17 +2,24 @@ package com.flopcode.books.android;
 
 import android.content.Context;
 import android.content.SharedPreferences;
-import android.widget.Toast;
+import android.preference.PreferenceManager;
+import android.support.design.widget.Snackbar;
+import android.view.View;
+import android.view.View.OnClickListener;
 
 import static android.content.Context.MODE_PRIVATE;
 
 public class BooksApplication {
   public static final String LOG_TAG = "Books";
-  private static final String API_KEY = "api-key";
-  private static final String BOOKS_SERVER = "books-server";
+  private static final String API_KEY = "apiKey";
+  private static final String BOOKS_SERVER = "booksServer";
 
   private static String getPreference(Context c, String s) {
     return getSharedPreferences(c).getString(s, null);
+  }
+
+  private static String getPreference(Context c, String s, String defaultValue) {
+    return PreferenceManager.getDefaultSharedPreferences(c).getString(s, defaultValue);
   }
 
   private static SharedPreferences getSharedPreferences(Context c) {
@@ -24,15 +31,20 @@ public class BooksApplication {
   }
 
   public static String getBooksServer(Context c) {
-    return getPreference(c, BOOKS_SERVER);
+    return getPreference(c, BOOKS_SERVER, "http://192.168.1.100:3000");
   }
 
   public static void storeApiKey(Context c, String apiKey) {
     getSharedPreferences(c).edit().putString(API_KEY, apiKey).commit();
   }
 
-  public static void toast(Context context, String s) {
-    Toast.makeText(context, s, Toast.LENGTH_LONG).show();
+  public static void showError(View l, String s, String buttonText, OnClickListener onClickListener) {
+    final Snackbar snackbar = Snackbar.make(l, s, Snackbar.LENGTH_LONG);
+    if (onClickListener != null) {
+      snackbar.setAction(buttonText, onClickListener);
+    }
+    snackbar.show();
+    //Toast.makeText(context, s, Toast.LENGTH_LONG).show();
   }
 
 }
