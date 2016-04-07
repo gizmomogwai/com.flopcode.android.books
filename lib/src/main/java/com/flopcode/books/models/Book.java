@@ -34,4 +34,8 @@ public class Book implements Serializable {
   public String toString() {
     return "Book { id = " + id + ", isbn = " + isbn + ", title = " + title + ", authors = " + authors + ", userId = " + userId + ", locationId = " + locationId + " }";
   }
+
+  public boolean isAvailable() {
+    return activeCheckout == 0;
+  }
 }

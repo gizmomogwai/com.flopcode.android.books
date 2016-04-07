@@ -1,6 +1,5 @@
 package com.flopcode.books.android.views.books;
 
-import android.app.Activity;
 import android.content.Intent;
 import android.os.AsyncTask;
 import android.os.Bundle;
@@ -16,7 +15,6 @@ import butterknife.OnClick;
 import com.flopcode.books.BooksApi;
 import com.flopcode.books.BooksApi.BooksService;
 import com.flopcode.books.BooksApi.IsbnLookupService;
-import com.flopcode.books.android.BooksApplication;
 import com.flopcode.books.android.R;
 import com.flopcode.books.models.Book;
 import com.google.zxing.integration.android.IntentIntegrator;
@@ -28,7 +26,7 @@ import retrofit2.Response;
 import static butterknife.ButterKnife.bind;
 import static com.flopcode.books.android.BooksApplication.LOG_TAG;
 
-public class Add extends Activity {
+public class Add extends BooksActivity {
 
   private BooksService booksService;
   @Bind(R.id.book_isbn)
@@ -47,7 +45,7 @@ public class Add extends Activity {
     super.onCreate(savedInstanceState);
     setContentView(R.layout.books_add);
     new IntentIntegrator(this).initiateScan();
-    booksService = BooksApi.createBooksService("http://localhost:3000", BooksApplication.getApiKey(this));
+    booksService = BooksApi.createBooksService("http://localhost:3000", getBooksApplication().getApiKey(this));
     isbnLookupService = BooksApi.createIsbnLookupService();
     bind(this);
   }
@@ -124,6 +122,11 @@ public class Add extends Activity {
     if (scanResult != null) {
       new GetBookAsyncTask().execute(scanResult.getContents());
     }
+  }
+
+  @Override
+  public void dataChanged() {
+
   }
 
   private class GetBookAsyncTask extends AsyncTask<String, Object, Book> {

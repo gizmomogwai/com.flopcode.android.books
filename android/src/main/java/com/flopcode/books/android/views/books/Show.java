@@ -11,7 +11,6 @@ import android.nfc.Tag;
 import android.nfc.tech.Ndef;
 import android.os.Bundle;
 import android.support.v4.app.NavUtils;
-import android.support.v7.app.AppCompatActivity;
 import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
@@ -23,7 +22,6 @@ import butterknife.ButterKnife;
 import butterknife.OnClick;
 import com.flopcode.books.BooksApi;
 import com.flopcode.books.BooksApi.ActiveCheckoutsService;
-import com.flopcode.books.android.BooksApplication;
 import com.flopcode.books.android.R;
 import com.flopcode.books.models.ActiveCheckout;
 import com.flopcode.books.models.Book;
@@ -35,7 +33,7 @@ import retrofit2.Response;
 import static com.flopcode.books.android.BooksApplication.LOG_TAG;
 import static com.flopcode.books.android.BooksApplication.showError;
 
-public class Show extends AppCompatActivity {
+public class Show extends BooksActivity {
 
   private static final int TAG_DETECTED = 17;
   private NfcAdapter nfcAdapter;
@@ -70,7 +68,7 @@ public class Show extends AppCompatActivity {
     super.onCreate(savedInstanceState);
 
     Log.d(LOG_TAG, "ShowBook.onCreate");
-    checkoutsService = BooksApi.createActiveCheckoutsService(BooksApplication.getBooksServer(this), BooksApplication.getApiKey(this));
+    checkoutsService = BooksApi.createActiveCheckoutsService(getBooksApplication().getBooksServer(this), getBooksApplication().getApiKey(this));
     setContentView(R.layout.books_show);
     ButterKnife.bind(this);
 
@@ -82,7 +80,7 @@ public class Show extends AppCompatActivity {
         Log.d(LOG_TAG, "incoming intent: " + uri);
         final String bookId = uri.getPathSegments().get(0);
         Log.d(LOG_TAG, "incoming intent bookId: " + bookId);
-        BooksApi.createBooksService(BooksApplication.getBooksServer(this), BooksApplication.getApiKey(this)).show(bookId).enqueue(new Callback<Book>() {
+        BooksApi.createBooksService(getBooksApplication().getBooksServer(this), getBooksApplication().getApiKey(this)).show(bookId).enqueue(new Callback<Book>() {
           @Override
           public void onResponse(Call<Book> call, Response<Book> response) {
             book = response.body();
@@ -235,5 +233,10 @@ public class Show extends AppCompatActivity {
         break;
     }
     return true;
+  }
+
+  @Override
+  public void dataChanged() {
+
   }
 }
