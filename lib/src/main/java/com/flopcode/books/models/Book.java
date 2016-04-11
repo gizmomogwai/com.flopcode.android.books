@@ -1,8 +1,11 @@
 package com.flopcode.books.models;
 
+import com.google.common.base.Predicate;
+import com.google.common.collect.Iterables;
 import com.google.gson.annotations.SerializedName;
 
 import java.io.Serializable;
+import java.util.List;
 
 public class Book implements Serializable {
   public final String id;
@@ -35,7 +38,25 @@ public class Book implements Serializable {
     return "Book { id = " + id + ", isbn = " + isbn + ", title = " + title + ", authors = " + authors + ", userId = " + userId + ", locationId = " + locationId + " }";
   }
 
-  public boolean isAvailable() {
-    return activeCheckout == 0;
+  public String status(List<User> users, final long me) {
+    if (activeCheckout == 0) {
+      return "available";
+    }
+
+    if (activeCheckout == me) {
+      return "checked out by me";
+    }
+
+    User res = Iterables.find(users, new Predicate<User>() {
+      @Override
+      public boolean apply(User input) {
+        return input.id == activeCheckout;
+      }
+    });
+    if (res != null) {
+      return "checked out by " + res.name;
+    }
+
+    return "checked out by unknown";
   }
 }

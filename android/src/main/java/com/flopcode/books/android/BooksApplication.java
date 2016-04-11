@@ -4,6 +4,7 @@ import android.app.Activity;
 import android.app.Application;
 import android.content.Context;
 import android.content.SharedPreferences;
+import android.net.Uri;
 import android.preference.PreferenceManager;
 import android.support.design.widget.Snackbar;
 import android.util.Log;
@@ -27,6 +28,7 @@ public class BooksApplication extends Application {
   public static final String LOG_TAG = "Books";
   private static final String API_KEY = "apiKey";
   private static final String BOOKS_SERVER = "booksServer";
+  private static final String USER_ID = "userId";
   private BooksService booksService;
   private UsersService usersService;
   private LocationsService locationsService;
@@ -37,6 +39,10 @@ public class BooksApplication extends Application {
 
   private String getPreference(Context c, String s) {
     return getSharedPreferences(c).getString(s, null);
+  }
+
+  private long getLongPreference(Context c, String s) {
+    return getSharedPreferences(c).getLong(s, 0);
   }
 
   private String getPreference(Context c, String s, String defaultValue) {
@@ -94,6 +100,14 @@ public class BooksApplication extends Application {
     final String res = getPreference(c, API_KEY);
     Log.e(LOG_TAG, "using api key: " + res);
     return res;
+  }
+
+  private void storeUserId(long userId) {
+    getSharedPreferences(this).edit().putLong(USER_ID, userId).commit();
+  }
+
+  public long getUserId(Context c) {
+    return getLongPreference(c, USER_ID);
   }
 
   public void fetchData(BooksActivity a) {
@@ -184,4 +198,13 @@ public class BooksApplication extends Application {
       }
     });
   }
+
+  public void storeUserIdAndApiKeyFromUri(Uri uri) {
+    long userId = Long.parseLong(uri.getPathSegments().get(1));
+    String apiKey = uri.getPathSegments().get(3);
+    storeApiKey(apiKey);
+    storeUserId(userId);
+  }
+
+
 }

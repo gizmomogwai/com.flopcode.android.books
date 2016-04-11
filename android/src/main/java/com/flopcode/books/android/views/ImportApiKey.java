@@ -16,9 +16,7 @@ public class ImportApiKey extends BooksActivity {
     super.onCreate(savedInstanceState);
     Intent intent = getIntent();
     Uri uri = intent.getData();
-    final String apiKey = uri.getPath().substring(1);
-    Log.e(LOG_TAG, "API_KEY: " + apiKey);
-    getBooksApplication().storeApiKey(apiKey);
+    getBooksApplication().storeUserIdAndApiKeyFromUri(uri);
     startActivity(new Intent(this, Index.class));
   }
 

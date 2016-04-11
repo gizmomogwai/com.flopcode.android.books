@@ -110,8 +110,7 @@ public class Index extends BooksActivity {
     if (scanResult != null) {
       Uri uri = Uri.parse(scanResult.getContents());
       if (uri.getScheme().equals("books-api-key")) {
-        String apiKey = uri.getLastPathSegment();
-        getBooksApplication().storeApiKey(apiKey);
+        getBooksApplication().storeUserIdAndApiKeyFromUri(uri);
       }
     }
   }
@@ -121,7 +120,7 @@ public class Index extends BooksActivity {
     updateUi();
   }
 
-  private static class CardAdapter extends RecyclerView.Adapter<BookHolder> {
+  private class CardAdapter extends RecyclerView.Adapter<BookHolder> {
 
     private List<Book> books;
 
@@ -140,7 +139,7 @@ public class Index extends BooksActivity {
     @Override
     public void onBindViewHolder(BookHolder holder, int i) {
       Book book = books.get(i);
-      holder.setBook(book);
+      holder.setBook(book, Index.this);
     }
 
     @Override
@@ -156,7 +155,7 @@ public class Index extends BooksActivity {
     public TextView title;
     public TextView authors;
     public TextView isbn;
-    public TextView available;
+    public TextView status;
 
     public BookHolder(View itemView) {
       super(itemView);
@@ -169,15 +168,16 @@ public class Index extends BooksActivity {
       title = ButterKnife.findById(itemView, R.id.title);
       authors = ButterKnife.findById(itemView, R.id.authors);
       isbn = ButterKnife.findById(itemView, R.id.isbn);
-      available = ButterKnife.findById(itemView, R.id.available);
+      status = ButterKnife.findById(itemView, R.id.status);
     }
 
-    public void setBook(Book book) {
+    public void setBook(Book book, BooksActivity a) {
       this.book = book;
+
       title.setText(book.title);
       authors.setText(book.authors);
       isbn.setText(book.isbn);
-      available.setText("available: " + book.isAvailable());
+      status.setText("status: " + book.status(a.getBooksApplication().users, a.getBooksApplication().getUserId(a)));
     }
   }
 }
