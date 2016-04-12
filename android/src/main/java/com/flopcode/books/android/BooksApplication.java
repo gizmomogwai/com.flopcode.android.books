@@ -18,6 +18,7 @@ import com.flopcode.books.android.views.books.BooksActivity;
 import com.flopcode.books.models.Book;
 import com.flopcode.books.models.Location;
 import com.flopcode.books.models.User;
+import com.google.common.collect.Lists;
 import retrofit2.Call;
 import retrofit2.Callback;
 import retrofit2.Response;
@@ -64,9 +65,9 @@ public class BooksApplication extends Application {
     snackbar.show();
   }
 
-  public List<Book> books;
-  public List<User> users;
-  public List<Location> locations;
+  public List<Book> books = Lists.newArrayList();
+  public List<User> users = Lists.newArrayList();
+  public List<Location> locations = Lists.newArrayList();
 
   public void setBooks(List<Book> books) {
     this.books = books;
@@ -111,9 +112,10 @@ public class BooksApplication extends Application {
   }
 
   public void fetchData(BooksActivity a) {
-    booksService = BooksApi.createBooksService(a.getBooksApplication().getBooksServer(this), a.getBooksApplication().getApiKey(this));
-    usersService = BooksApi.createUsersService(a.getBooksApplication().getBooksServer(this), a.getBooksApplication().getApiKey(this));
-    locationsService = BooksApi.createLocationsService(a.getBooksApplication().getBooksServer(this), a.getBooksApplication().getApiKey(this));
+    final String apiKey = a.getBooksApplication().getApiKey(this);
+    booksService = BooksApi.createBooksService(a.getBooksApplication().getBooksServer(this), apiKey);
+    usersService = BooksApi.createUsersService(a.getBooksApplication().getBooksServer(this), apiKey);
+    locationsService = BooksApi.createLocationsService(a.getBooksApplication().getBooksServer(this), apiKey);
     fetchBooks(a);
     fetchUsers(a);
     fetchLocations(a);
@@ -200,8 +202,9 @@ public class BooksApplication extends Application {
   }
 
   public void storeUserIdAndApiKeyFromUri(Uri uri) {
-    long userId = Long.parseLong(uri.getPathSegments().get(1));
-    String apiKey = uri.getPathSegments().get(3);
+    final List<String> pathSegments = uri.getPathSegments();
+    long userId = Long.parseLong(pathSegments.get(1));
+    String apiKey = pathSegments.get(3);
     storeApiKey(apiKey);
     storeUserId(userId);
   }

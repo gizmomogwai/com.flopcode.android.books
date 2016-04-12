@@ -15,7 +15,9 @@ import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
+import android.widget.ArrayAdapter;
 import android.widget.Button;
+import android.widget.Spinner;
 import android.widget.TextView;
 import butterknife.Bind;
 import butterknife.ButterKnife;
@@ -25,6 +27,11 @@ import com.flopcode.books.BooksApi.ActiveCheckoutsService;
 import com.flopcode.books.android.R;
 import com.flopcode.books.models.ActiveCheckout;
 import com.flopcode.books.models.Book;
+import com.flopcode.books.models.Location;
+import com.google.common.base.Function;
+import com.google.common.base.Predicate;
+import com.google.common.collect.FluentIterable;
+import com.google.common.collect.Iterables;
 import com.google.common.collect.Lists;
 import retrofit2.Call;
 import retrofit2.Callback;
@@ -55,6 +62,9 @@ public class Show extends BooksActivity {
 
   @Bind(R.id.book_owner)
   TextView owner;
+
+  @Bind(R.id.location)
+  Spinner locationSpinner;
 
   @Bind(R.id.checkout_checkin_button)
   Button checkoutCheckinButton;
@@ -155,7 +165,7 @@ public class Show extends BooksActivity {
     runOnUiThread(new Runnable() {
       @Override
       public void run() {
-        book.activeCheckout = Long.parseLong(body.id);
+        book.activeCheckout = body.id;
         mount(book);
       }
     });
@@ -165,13 +175,28 @@ public class Show extends BooksActivity {
     return true;
   }
 
-  private void mount(Book book) {
+  private void mount(final Book book) {
     this.book = book;
     id.setText("nyi");//book.id);
     isbn.setText(book.isbn);
     title.setText(book.title);
     authors.setText(book.authors);
     owner.setText("nyi");
+    final ArrayAdapter<String> adapter = new ArrayAdapter<>(this, android.R.layout.simple_spinner_item);
+    adapter.addAll(Lists.transform(getBooksApplication().getLocations(), new Function<Location, String>() {
+      @Override
+      public String apply(Location input) {
+        return input.name;
+      }
+    }));
+    locationSpinner.setAdapter(adapter);
+    int idx = Iterables.indexOf(getBooksApplication().getLocations(), new Predicate<Location>() {
+      @Override
+      public boolean apply(Location input) {
+        return input.id == book.locationId;
+      }
+    });
+    locationSpinner.setSelection(idx);
     checkoutCheckinButton.setText(book.activeCheckout == 0 ? "Checkout" : "Checkin");
   }
 

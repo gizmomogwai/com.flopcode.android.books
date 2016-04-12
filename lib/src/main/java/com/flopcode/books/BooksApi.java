@@ -113,7 +113,7 @@ public class BooksApi {
     @FormUrlEncoded
     @POST(ACTIVE_CHECKOUTS_API)
     @Headers("Accept: application/json")
-    Call<ActiveCheckout> create(@Field("book") String bookId);
+    Call<ActiveCheckout> create(@Field("book") long bookId);
 
     @DELETE(ACTIVE_CHECKOUTS_API + "/{id}")
     @Headers("Accept: application/json")

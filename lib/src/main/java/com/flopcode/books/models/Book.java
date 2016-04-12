@@ -8,7 +8,7 @@ import java.io.Serializable;
 import java.util.List;
 
 public class Book implements Serializable {
-  public final String id;
+  public final long id;
   public final String isbn;
   public final String title;
   public final String authors;
@@ -19,7 +19,7 @@ public class Book implements Serializable {
   @SerializedName("active_checkout_id")
   public long activeCheckout;
 
-  public Book(String id, String isbn, String title, String authors, long user, long location, long activeCheckout) {
+  public Book(long id, String isbn, String title, String authors, long user, long location, long activeCheckout) {
     this.id = id;
     this.isbn = isbn;
     this.title = title;
@@ -30,7 +30,7 @@ public class Book implements Serializable {
   }
 
   public Book(String isbn, String title, String authors) {
-    this(null, isbn, title, authors, -1, -1, -1);
+    this(0, isbn, title, authors, -1, -1, -1);
   }
 
   @Override

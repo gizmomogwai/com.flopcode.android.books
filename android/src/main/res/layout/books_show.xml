@@ -37,10 +37,14 @@
         android:id="@+id/book_owner"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"/>
+      <Spinner
+        android:id="@+id/location"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"/>
       <Button
         android:id="@+id/checkout_checkin_button"
         android:layout_width="match_parent"
-        android:layout_height="wrap_content" />
+        android:layout_height="wrap_content"/>
     </LinearLayout>
   </android.support.v7.widget.CardView>
 </android.support.design.widget.CoordinatorLayout>
