@@ -6,7 +6,7 @@
     android:title="@string/action_settings"/>
   <item
     android:id="@+id/action_write_tag_to_book"
-    android:title="@string/action_write_tag_to_book"/>
+    android:title="@string/action_write_tag_to_book" />
   <item
     android:id="@+id/action_checkout_book"
     android:title="@string/action_checkout_book"/>

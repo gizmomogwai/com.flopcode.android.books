@@ -1,4 +1,19 @@
 * Android App for Books
+** Prerequisites
+- you need java at least java 7
+- you need a workspace like this:
+  books-workspace
+  +- server
+  +- frontend
+- the server must work (please run in the server directory)
+  - rvm install 2.3.0
+  - rvm create 2.3.0@books
+  - bundle install
+  - bundle exec rake
+- the project is built by gradle (and gradlewrapper)
+  - put a line like sdk.dir=/Users/gizmo/Library/Android/sdk into
+    local.properties
+  - run ./gradlew clean build
 
 ** Todos
 *** DONE list books

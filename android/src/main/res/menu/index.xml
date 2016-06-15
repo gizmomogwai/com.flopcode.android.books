@@ -11,4 +11,7 @@
   <item
     android:id="@+id/action_set_api_key"
     android:title="@string/action_import_api_key"/>
+  <item
+    android:id="@+id/action_refresh"
+    android:title="Refresh"/>
 </menu>

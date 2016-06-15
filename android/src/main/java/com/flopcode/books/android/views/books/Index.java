@@ -99,6 +99,9 @@ public class Index extends BooksActivity {
       case R.id.action_set_api_key:
         new IntentIntegrator(this).initiateScan();
         return true;
+      case R.id.action_refresh:
+        getBooksApplication().refetchData(this);
+        return true;
     }
 
     return super.onOptionsItemSelected(item);

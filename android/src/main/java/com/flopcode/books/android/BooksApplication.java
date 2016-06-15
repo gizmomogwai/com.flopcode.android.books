@@ -18,7 +18,6 @@ import com.flopcode.books.android.views.books.BooksActivity;
 import com.flopcode.books.models.Book;
 import com.flopcode.books.models.Location;
 import com.flopcode.books.models.User;
-import com.google.common.collect.Lists;
 import retrofit2.Call;
 import retrofit2.Callback;
 import retrofit2.Response;
@@ -33,6 +32,18 @@ public class BooksApplication extends Application {
   private BooksService booksService;
   private UsersService usersService;
   private LocationsService locationsService;
+
+  @Override
+  public void onCreate() {
+    super.onCreate();
+    Log.e(LOG_TAG, "BooksApplication.onCreate");
+  }
+
+  @Override
+  public void onTerminate() {
+    Log.e(LOG_TAG, "BooksApplication.onDestroy");
+    super.onTerminate();
+  }
 
   public SharedPreferences getSharedPreferences(Context c) {
     return c.getSharedPreferences("books", MODE_PRIVATE);
@@ -65,9 +76,9 @@ public class BooksApplication extends Application {
     snackbar.show();
   }
 
-  public List<Book> books = Lists.newArrayList();
-  public List<User> users = Lists.newArrayList();
-  public List<Location> locations = Lists.newArrayList();
+  public List<Book> books = null;
+  public List<User> users = null;
+  public List<Location> locations = null;
 
   public void setBooks(List<Book> books) {
     this.books = books;
@@ -111,17 +122,57 @@ public class BooksApplication extends Application {
     return getLongPreference(c, USER_ID);
   }
 
+  public void refetchData(BooksActivity a) {
+    clearServices();
+    clearBooks();
+    clearUsers();
+    clearLocations();
+  }
+
+  private void clearLocations() {
+    locations = null;
+  }
+
+  private void clearUsers() {
+    users = null;
+  }
+
+  private void clearBooks() {
+    books = null;
+  }
+
+  private void clearServices() {
+    booksService = null;
+    usersService = null;
+    locationsService = null;
+  }
+
   public void fetchData(BooksActivity a) {
-    final String apiKey = a.getBooksApplication().getApiKey(this);
-    booksService = BooksApi.createBooksService(a.getBooksApplication().getBooksServer(this), apiKey);
-    usersService = BooksApi.createUsersService(a.getBooksApplication().getBooksServer(this), apiKey);
-    locationsService = BooksApi.createLocationsService(a.getBooksApplication().getBooksServer(this), apiKey);
+    createServices(a);
     fetchBooks(a);
     fetchUsers(a);
     fetchLocations(a);
   }
 
+  private void createServices(BooksActivity a) {
+    final String apiKey = a.getBooksApplication().getApiKey(this);
+    if (booksService == null) {
+      booksService = BooksApi.createBooksService(a.getBooksApplication().getBooksServer(this), apiKey);
+    }
+    if (usersService == null) {
+      usersService = BooksApi.createUsersService(a.getBooksApplication().getBooksServer(this), apiKey);
+    }
+    if (locationsService == null) {
+      locationsService = BooksApi.createLocationsService(a.getBooksApplication().getBooksServer(this), apiKey);
+    }
+  }
+
   public void fetchBooks(final BooksActivity a) {
+    if (books != null) {
+      a.dataChanged();
+      return;
+    }
+
     booksService.index().enqueue(new Callback<List<Book>>() {
       @Override
       public void onResponse(Call<List<Book>> call, final Response<List<Book>> response) {
@@ -143,6 +194,11 @@ public class BooksApplication extends Application {
   }
 
   public void fetchLocations(final BooksActivity a) {
+    if (locations != null) {
+      a.dataChanged();
+      return;
+    }
+
     locationsService.index().enqueue(new Callback<List<Location>>() {
       @Override
       public void onResponse(Call<List<Location>> call, final Response<List<Location>> response) {
@@ -180,6 +236,11 @@ public class BooksApplication extends Application {
   }
 
   public void fetchUsers(final BooksActivity a) {
+    if (users != null) {
+      a.dataChanged();
+      return;
+    }
+
     usersService.index().enqueue(new Callback<List<com.flopcode.books.models.User>>() {
 
       @Override

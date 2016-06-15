@@ -23,12 +23,12 @@ public class BooksIntegrationTest extends WithBooksServerTest {
   @Test
   public void testBooksShow() throws Exception {
     Call<List<Book>> call1 = BooksApi.createBooksService(booksServer, "key2").index();
-    String id = call1.execute().body().get(0).id;
+    long id = call1.execute().body().get(0).id;
 
-    Call<Book> call = BooksApi.createBooksService(booksServer, "key2").show(id);
+    Call<Book> call = BooksApi.createBooksService(booksServer, "key2").show("" + id);
     Response<Book> res = call.execute();
     Book book = res.body();
-    assertThat(book.id).isEqualTo("1");
+    assertThat(book.id).isEqualTo(1);
     assertThat(book.isbn).isEqualTo("isbn1");
     assertThat(book.title).isEqualTo("title1");
     assertThat(book.authors).isEqualTo("authors1");

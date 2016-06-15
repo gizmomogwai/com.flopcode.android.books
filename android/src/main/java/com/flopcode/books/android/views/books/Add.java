@@ -7,8 +7,11 @@ import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
+import android.view.ViewGroup;
+import android.widget.ArrayAdapter;
 import android.widget.EditText;
 import android.widget.Spinner;
+import android.widget.TextView;
 import android.widget.Toast;
 import butterknife.Bind;
 import butterknife.OnClick;
@@ -17,6 +20,7 @@ import com.flopcode.books.BooksApi.BooksService;
 import com.flopcode.books.BooksApi.IsbnLookupService;
 import com.flopcode.books.android.R;
 import com.flopcode.books.models.Book;
+import com.flopcode.books.models.User;
 import com.google.zxing.integration.android.IntentIntegrator;
 import com.google.zxing.integration.android.IntentResult;
 import retrofit2.Call;
@@ -38,7 +42,11 @@ public class Add extends BooksActivity {
   @Bind(R.id.book_authors)
   public EditText authors;
 
-  private IsbnLookupService isbnLookupService;
+  @Bind(R.id.book_owner)
+  public Spinner owner;
+
+  @Bind(R.id.book_location)
+  public Spinner location;
 
   @Override
   protected void onCreate(Bundle savedInstanceState) {
@@ -46,8 +54,9 @@ public class Add extends BooksActivity {
     setContentView(R.layout.books_add);
     new IntentIntegrator(this).initiateScan();
     booksService = BooksApi.createBooksService("http://localhost:3000", getBooksApplication().getApiKey(this));
-    isbnLookupService = BooksApi.createIsbnLookupService();
     bind(this);
+
+    getBooksApplication().fetchData(this);
   }
 
   @OnClick(R.id.cancel_button)
@@ -82,6 +91,19 @@ public class Add extends BooksActivity {
   }
 
   private void fillForm(Book book) {
+    final ArrayAdapter<User> adapter = new ArrayAdapter<User>(this, android.R.layout.simple_spinner_item) {
+      @Override
+      public View getView(int position, View convertView, ViewGroup parent) {
+        View res = super.getView(position, convertView, parent);
+        User item = getItem(position);
+        ((TextView)res).setText(item.account);
+        return res;
+      }
+    };
+    adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
+    adapter.addAll(getBooksApplication().getUsers());
+    owner.setAdapter(adapter);
+
     if (book == null) {
       Toast.makeText(this, "could not fetch book data", Toast.LENGTH_LONG).show();
       return;
@@ -90,7 +112,10 @@ public class Add extends BooksActivity {
     isbn.setText(book.isbn);
     title.setText(book.title);
     authors.setText(book.authors);
-    Spinner owner = (Spinner) findViewById(R.id.book_owner);
+
+    //final ArrayAdapter<String> adapter = new ArrayAdapter<>(this, )
+
+    // TODO location
   }
 
   @Override
@@ -126,7 +151,7 @@ public class Add extends BooksActivity {
 
   @Override
   public void dataChanged() {
-
+    fillForm(null);
   }
 
   private class GetBookAsyncTask extends AsyncTask<String, Object, Book> {

@@ -32,7 +32,8 @@ def passwordFromKeychain = { name ->
   return stdout.trim()
 }
 
-android { compileSdkVersion 23
+android {
+  compileSdkVersion 23
   buildToolsVersion "23.0.3"
 
   defaultConfig {

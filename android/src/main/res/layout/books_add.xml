@@ -40,6 +40,12 @@
     android:layout_gravity="center_horizontal"
     android:id="@+id/book_owner"/>
 
+  <Spinner
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:layout_gravity="center_horizontal"
+    android:id="@+id/book_location"/>
+
 
   <LinearLayout
     android:layout_width="match_parent"

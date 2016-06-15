@@ -1,7 +1,6 @@
 package com.flopcode.books.android.test;
 
 import com.google.common.collect.Collections2;
-import com.google.common.collect.Iterables;
 import com.google.common.collect.Lists;
 import org.joda.time.DateTime;
 import org.joda.time.Seconds;
@@ -15,9 +14,8 @@ import java.net.URL;
 import java.net.URLConnection;
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.Map.Entry;
 import java.util.Scanner;
-import java.util.function.Function;
-import java.util.function.Predicate;
 
 public abstract class WithBooksServerTest {
   public static final String booksServer = "http://127.0.0.1:3000";
@@ -139,7 +137,7 @@ public abstract class WithBooksServerTest {
           }
         }).findFirst().get();
         */
-        System.out.println("pid = " + pid);
+      System.out.println("pid = " + pid);
       if (pid == null || pid.length() == 0) {
         throw new RuntimeException("could not determine pid of rails app");
       }
@@ -148,7 +146,12 @@ public abstract class WithBooksServerTest {
 
     public static AutonomeProcess run(File workingDirectory, boolean debug, String stdout, String stderr, String... command) throws Exception {
       if (!workingDirectory.exists()) {
-        throw new RuntimeException("working directory does not exist");
+
+        throw new RuntimeException("working directory does not exist " + new File(".").getAbsolutePath());
+      }
+      System.out.println("workingDirectory = " + workingDirectory.getAbsoluteFile());
+      for (File f: workingDirectory.getAbsoluteFile().listFiles()) {
+        System.out.println("f = " + f);
       }
       System.out.println("AutonomeProcess.run");
       for (String s : command) {
@@ -185,7 +188,7 @@ public abstract class WithBooksServerTest {
   @Before
   public void setUp() throws Exception {
     System.out.println("WithBooksServerTest.setUp");
-    railsServer = AutonomeProcess.run(new File("../../server"), true, null, "WEBrick::HTTPServer#start", "/Users/gizmo/.rvm/gems/ruby-2.3.0@books/wrappers/rake", "run_testserver");
+    railsServer = AutonomeProcess.run(new File("../../server"), true, null, "WEBrick::HTTPServer#start", System.getProperty("user.home") + "/.rvm/gems/ruby-2.3.0@books/wrappers/bundle", "exec", "rake", "run_testserver");
     waitForRailsServer();
   }
 

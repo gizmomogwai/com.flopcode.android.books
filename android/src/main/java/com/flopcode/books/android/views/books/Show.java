@@ -15,9 +15,7 @@ import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
-import android.widget.ArrayAdapter;
 import android.widget.Button;
-import android.widget.Spinner;
 import android.widget.TextView;
 import butterknife.Bind;
 import butterknife.ButterKnife;
@@ -28,9 +26,7 @@ import com.flopcode.books.android.R;
 import com.flopcode.books.models.ActiveCheckout;
 import com.flopcode.books.models.Book;
 import com.flopcode.books.models.Location;
-import com.google.common.base.Function;
 import com.google.common.base.Predicate;
-import com.google.common.collect.FluentIterable;
 import com.google.common.collect.Iterables;
 import com.google.common.collect.Lists;
 import retrofit2.Call;
@@ -40,13 +36,16 @@ import retrofit2.Response;
 import static com.flopcode.books.android.BooksApplication.LOG_TAG;
 import static com.flopcode.books.android.BooksApplication.showError;
 
+/**
+ * shows a book
+ * needs the book information, the locations and users in the database
+ */
 public class Show extends BooksActivity {
 
   private static final int TAG_DETECTED = 17;
   private NfcAdapter nfcAdapter;
   private PendingIntent pendingIntent;
   private IntentFilter discovery;
-  private IntentFilter ndefDetected;
 
   @Bind(R.id.book_id)
   TextView id;
@@ -64,7 +63,7 @@ public class Show extends BooksActivity {
   TextView owner;
 
   @Bind(R.id.location)
-  Spinner locationSpinner;
+  TextView location;
 
   @Bind(R.id.checkout_checkin_button)
   Button checkoutCheckinButton;
@@ -83,7 +82,29 @@ public class Show extends BooksActivity {
     ButterKnife.bind(this);
 
     final Intent intent = getIntent();
+
     Log.d(LOG_TAG, intent.toString());
+    handleNfcIntent(intent);
+    handleBookIntent(intent);
+
+    nfcAdapter = NfcAdapter.getDefaultAdapter(this);
+    pendingIntent = PendingIntent
+      .getActivity(this, TAG_DETECTED,
+        new Intent(this, this.getClass())
+          .addFlags(Intent.FLAG_ACTIVITY_SINGLE_TOP | Intent.FLAG_ACTIVITY_CLEAR_TOP), 0);
+    discovery = new IntentFilter(NfcAdapter.ACTION_TAG_DISCOVERED);
+
+    getBooksApplication().fetchData(this);
+  }
+
+  private void handleBookIntent(Intent intent) {
+    if (intent.hasExtra("book")) {
+      book = (Book) intent.getSerializableExtra("book");
+      dataChanged();
+    }
+  }
+
+  private void handleNfcIntent(Intent intent) {
     if (NfcAdapter.ACTION_NDEF_DISCOVERED.equals(intent.getAction())) {
       if (intent.getData() != null) {
         Uri uri = intent.getData();
@@ -104,18 +125,6 @@ public class Show extends BooksActivity {
         });
       }
     }
-
-    if (intent.hasExtra("book")) {
-      mount((Book) intent.getSerializableExtra("book"));
-    }
-
-    nfcAdapter = NfcAdapter.getDefaultAdapter(this);
-    pendingIntent = PendingIntent
-      .getActivity(this, TAG_DETECTED,
-        new Intent(this, this.getClass())
-          .addFlags(Intent.FLAG_ACTIVITY_SINGLE_TOP | Intent.FLAG_ACTIVITY_CLEAR_TOP), 0);
-    discovery = new IntentFilter(NfcAdapter.ACTION_TAG_DISCOVERED);
-    ndefDetected = new IntentFilter(NfcAdapter.ACTION_NDEF_DISCOVERED);
   }
 
   @OnClick(R.id.checkout_checkin_button)
@@ -156,7 +165,7 @@ public class Show extends BooksActivity {
       @Override
       public void run() {
         book.activeCheckout = 0;
-        mount(book);
+        dataChanged();
       }
     });
   }
@@ -166,7 +175,7 @@ public class Show extends BooksActivity {
       @Override
       public void run() {
         book.activeCheckout = body.id;
-        mount(book);
+        dataChanged();
       }
     });
   }
@@ -182,21 +191,13 @@ public class Show extends BooksActivity {
     title.setText(book.title);
     authors.setText(book.authors);
     owner.setText("nyi");
-    final ArrayAdapter<String> adapter = new ArrayAdapter<>(this, android.R.layout.simple_spinner_item);
-    adapter.addAll(Lists.transform(getBooksApplication().getLocations(), new Function<Location, String>() {
-      @Override
-      public String apply(Location input) {
-        return input.name;
-      }
-    }));
-    locationSpinner.setAdapter(adapter);
-    int idx = Iterables.indexOf(getBooksApplication().getLocations(), new Predicate<Location>() {
+    Location l = Iterables.find(getBooksApplication().getLocations(), new Predicate<Location>() {
       @Override
       public boolean apply(Location input) {
         return input.id == book.locationId;
       }
     });
-    locationSpinner.setSelection(idx);
+    location.setText(l.name);
     checkoutCheckinButton.setText(book.activeCheckout == 0 ? "Checkout" : "Checkin");
   }
 
@@ -262,6 +263,13 @@ public class Show extends BooksActivity {
 
   @Override
   public void dataChanged() {
+    if (dataComplete()) {
+      mount(book);
+    }
+  }
 
+  // needs locations and users to display a book properly
+  private boolean dataComplete() {
+    return book != null && getBooksApplication().getLocations() != null && getBooksApplication().getUsers() != null;
   }
 }
