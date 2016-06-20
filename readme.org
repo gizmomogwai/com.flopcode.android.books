@@ -6,8 +6,8 @@
   +- server
   +- frontend
 - the server must work (please run in the server directory)
-  - rvm install 2.3.0
-  - rvm create 2.3.0@books
+  - rvm install 2.3.1
+  - rvm create 2.3.1@books
   - bundle install
   - bundle exec rake
 - the project is built by gradle (and gradlewrapper)
