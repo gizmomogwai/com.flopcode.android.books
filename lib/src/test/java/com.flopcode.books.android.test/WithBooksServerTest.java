@@ -170,7 +170,7 @@ public abstract class WithBooksServerTest {
     public void destroy() {
       try {
         if (process.isAlive()) {
-          AutonomeProcess.run(new File("."), false, null, null, "kill", "-s", "SIGINT", "" + getPid("rails s")).waitFor();
+          AutonomeProcess.run(new File("."), false, null, null, "kill", "-INT", "" + getPid("bin/rails s")).waitFor();
         }
         process.waitFor();
         System.out.println("AutonomeProcess.destroy - finished");
