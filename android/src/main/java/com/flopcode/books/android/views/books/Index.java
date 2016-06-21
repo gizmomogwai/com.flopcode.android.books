@@ -4,6 +4,7 @@ import android.content.Context;
 import android.content.Intent;
 import android.net.Uri;
 import android.os.Bundle;
+import android.support.v4.widget.SwipeRefreshLayout;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.util.Log;
@@ -30,6 +31,8 @@ public class Index extends BooksActivity {
 
   @Bind(R.id.recycler_view)
   RecyclerView booksList;
+  @Bind(R.id.swipeRefreshLayout)
+  SwipeRefreshLayout refreshLayout;
   private CardAdapter cardAdapter;
 
   @Override
@@ -48,6 +51,15 @@ public class Index extends BooksActivity {
     booksList.setAdapter(cardAdapter);
 
     getBooksApplication().fetchData(this);
+
+    refreshLayout.setOnRefreshListener(new SwipeRefreshLayout.OnRefreshListener() {
+      @Override
+      public void onRefresh() {
+        // Refresh items
+        getBooksApplication().refetchData(Index.this);
+        getBooksApplication().fetchData(Index.this, Index.this.refreshLayout);
+      }
+    });
   }
 
   @Override
@@ -98,9 +110,6 @@ public class Index extends BooksActivity {
         return true;
       case R.id.action_set_api_key:
         new IntentIntegrator(this).initiateScan();
-        return true;
-      case R.id.action_refresh:
-        getBooksApplication().refetchData(this);
         return true;
     }
 

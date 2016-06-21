@@ -7,6 +7,7 @@ import android.content.SharedPreferences;
 import android.net.Uri;
 import android.preference.PreferenceManager;
 import android.support.design.widget.Snackbar;
+import android.support.v4.widget.SwipeRefreshLayout;
 import android.util.Log;
 import android.view.View;
 import android.view.View.OnClickListener;
@@ -152,6 +153,11 @@ public class BooksApplication extends Application {
     fetchBooks(a);
     fetchUsers(a);
     fetchLocations(a);
+  }
+
+  public void fetchData(BooksActivity a, SwipeRefreshLayout updatedLayout) {
+    fetchData(a);
+    updatedLayout.setRefreshing(false);
   }
 
   private void createServices(BooksActivity a) {
