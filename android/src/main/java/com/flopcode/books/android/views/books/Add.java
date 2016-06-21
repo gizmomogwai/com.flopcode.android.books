@@ -28,6 +28,7 @@ import retrofit2.Callback;
 import retrofit2.Response;
 
 import static butterknife.ButterKnife.bind;
+import static com.flopcode.books.BooksApi.createIsbnLookupService;
 import static com.flopcode.books.android.BooksApplication.LOG_TAG;
 
 public class Add extends BooksActivity {
@@ -167,10 +168,8 @@ public class Add extends BooksActivity {
       return null;
     }
 
-    private IsbnLookupService isbnLookupService;
-
     private Book findBookForIsbn(String isbn) throws Exception {
-      return isbnLookupService.find("ISBN:" + isbn).execute().body();
+      return createIsbnLookupService().find("ISBN:" + isbn).execute().body();
     }
 
     @Override
