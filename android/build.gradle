@@ -37,14 +37,15 @@ android {
   buildToolsVersion "23.0.3"
 
   defaultConfig {
-    minSdkVersion 23
-    targetSdkVersion 23
+    minSdkVersion 21
+    targetSdkVersion 21
   }
 
   compileOptions {
     sourceCompatibility JavaVersion.VERSION_1_7
     targetCompatibility JavaVersion.VERSION_1_7
   }
+
   /*
   signingConfigs {
     release {
@@ -61,6 +62,7 @@ android {
     }
   }
   */
+
   lintOptions {
     abortOnError false
   }
