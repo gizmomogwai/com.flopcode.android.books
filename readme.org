@@ -1,5 +1,5 @@
 * Android App for Books
-** Prerequisites
+** Prerequisites / Getting started
 - you need java at least java 7
 - you need a workspace like this:
   books-workspace
@@ -13,8 +13,16 @@
   - bundle install
   - bundle exec rake
 - java 1.8
-- idea
+  - set JAVA_HOME
 - android-sdk
+  - android sdk tools - 25.1.7
+  - android sdk platform tools - 24
+  - android sdk build tools - 24
+  - android 6.0 sdk platform - 23
+  - android support repository - 33
+  - android support library - 23.2.1
+  - set ANDROID_HOME
+- idea 2016.1.3
 - the project is built by gradle (and gradlewrapper)
   - put a line like sdk.dir=/Users/gizmo/Library/Android/sdk into
     local.properties
@@ -41,16 +49,15 @@
 *** TODO navigate back from one book to index
 *** login for users
 
-
-
 * Bugs
 ** DONE nfc not enabled
 ** timestamps in checkouts
-** IN-PROGRESS refresh booklist with swipe                         :mikhail:
-** getting started guide
+** DONE refresh booklist with swipe                                :mikhail:
+** show refresh progress from the start
+** DONE getting started guide                                           :ck:
 ** reals password ldap
 ** checking connection to server
-** add book button on main screen
+** IN-PROGRESS add book button on main screen                      :mikhail:
 ** show unauthorized dialog
-** IN-PROGRESS landing page nach login                                  :ck:
-** make android app it smaller
+** DONE landing page nach login                                         :ck:
+** make android app smaller
