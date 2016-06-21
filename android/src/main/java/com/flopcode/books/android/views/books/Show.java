@@ -1,6 +1,8 @@
 package com.flopcode.books.android.views.books;
 
+import android.app.AlertDialog;
 import android.app.PendingIntent;
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.IntentFilter;
 import android.net.Uri;
@@ -10,6 +12,7 @@ import android.nfc.NfcAdapter;
 import android.nfc.Tag;
 import android.nfc.tech.Ndef;
 import android.os.Bundle;
+import android.provider.Settings;
 import android.support.v4.app.NavUtils;
 import android.util.Log;
 import android.view.Menu;
@@ -32,6 +35,9 @@ import com.google.common.collect.Lists;
 import retrofit2.Call;
 import retrofit2.Callback;
 import retrofit2.Response;
+
+import java.lang.reflect.InvocationTargetException;
+import java.lang.reflect.Method;
 
 import static com.flopcode.books.android.BooksApplication.LOG_TAG;
 import static com.flopcode.books.android.BooksApplication.showError;
@@ -88,6 +94,31 @@ public class Show extends BooksActivity {
     handleBookIntent(intent);
 
     nfcAdapter = NfcAdapter.getDefaultAdapter(this);
+    if (nfcAdapter == null) {
+      Log.e(LOG_TAG, "Can't get NFC adapter");
+    }
+    if (!nfcAdapter.isEnabled()) {
+      new AlertDialog.Builder(this)
+        .setTitle("NFC disabled")
+        .setMessage("Enable nfc?")
+        .setPositiveButton(android.R.string.yes, new DialogInterface.OnClickListener() {
+          public void onClick(DialogInterface dialog, int which) {
+            startActivityForResult(new Intent(Settings.ACTION_NFC_SETTINGS), 0);
+          }
+        })
+        .setNegativeButton(android.R.string.no, new DialogInterface.OnClickListener() {
+          public void onClick(DialogInterface dialog, int which) {
+            new AlertDialog.Builder(Show.this)
+              .setTitle("NFC disabled")
+              .setMessage("Please enable nfc in system settings")
+              .setPositiveButton(android.R.string.yes, null)
+              .setIcon(android.R.drawable.ic_dialog_alert)
+              .show();
+          }
+        })
+        .setIcon(android.R.drawable.ic_dialog_alert)
+        .show();
+    }
     pendingIntent = PendingIntent
       .getActivity(this, TAG_DETECTED,
         new Intent(this, this.getClass())
