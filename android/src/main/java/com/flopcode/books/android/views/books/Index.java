@@ -4,6 +4,7 @@ import android.content.Context;
 import android.content.Intent;
 import android.net.Uri;
 import android.os.Bundle;
+import android.support.design.widget.FloatingActionButton;
 import android.support.v4.widget.SwipeRefreshLayout;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
@@ -33,6 +34,8 @@ public class Index extends BooksActivity {
   RecyclerView booksList;
   @Bind(R.id.swipeRefreshLayout)
   SwipeRefreshLayout refreshLayout;
+  @Bind(R.id.add_book_fab)
+  FloatingActionButton addFab;
   private CardAdapter cardAdapter;
 
   @Override
@@ -58,6 +61,13 @@ public class Index extends BooksActivity {
         // Refresh items
         getBooksApplication().refetchData(Index.this);
         getBooksApplication().fetchData(Index.this, Index.this.refreshLayout);
+      }
+    });
+
+    addFab.setOnClickListener(new OnClickListener() {
+      @Override
+      public void onClick(View v) {
+        startActivity(new Intent(Index.this, Add.class));
       }
     });
   }
@@ -104,9 +114,6 @@ public class Index extends BooksActivity {
     switch (item.getItemId()) {
       case R.id.action_settings:
         showPreferences();
-        return true;
-      case R.id.action_add_book:
-        startActivity(new Intent(this, Add.class));
         return true;
       case R.id.action_set_api_key:
         new IntentIntegrator(this).initiateScan();
