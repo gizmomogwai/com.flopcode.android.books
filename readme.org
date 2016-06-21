@@ -46,10 +46,11 @@
 * Bugs
 ** DONE nfc not enabled
 ** timestamps in checkouts
-** refresh booklist with swipe
+** IN-PROGRESS refresh booklist with swipe                         :mikhail:
 ** getting started guide
 ** reals password ldap
 ** checking connection to server
 ** add book button on main screen
 ** show unauthorized dialog
-** landing page nach login
+** IN-PROGRESS landing page nach login                                  :ck:
+** make android app it smaller
