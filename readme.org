@@ -3,22 +3,54 @@
 - you need java at least java 7
 - you need a workspace like this:
   books-workspace
-  +- server
-  +- frontend
+  +- server -> [[https://github.com/gizmomogwai/com.flopcode.books.android][https://github.com/gizmomogwai/com.flopcode.books]]
+  +- frontend -> [[https://github.com/gizmomogwai/com.flopcode.books.android][https://github.com/gizmomogwai/com.flopcode.books.android]]
 - the server must work (please run in the server directory)
   - rvm install 2.3.1
-  - rvm create 2.3.1@books
+  - rvm use 2.3.1@books --create
+  - gem install bundler
+  - rvm wrapper 2.3.1@books bundle
   - bundle install
   - bundle exec rake
+- java 1.8
+- idea
+- android-sdk
 - the project is built by gradle (and gradlewrapper)
   - put a line like sdk.dir=/Users/gizmo/Library/Android/sdk into
     local.properties
   - run ./gradlew clean build
 
+** Basic workflow
+*** Add new book to library
+- press add book, scan isbn, safe
+- select write nfc tag from menu
+- write tag to book
+*** Borrow a book
+- scan nfc tag of book
+- if its available press borrow
+*** TODO Give book back
+- Go to one of the admins and give him the book
+- he scans the nfc tag, if he is a admin he has the take book back
+  button
+
 ** Todos
+*** ldap support for users, use ldap groups for roles?
+*** use better isbn lookup (google books)
 *** DONE list books
 *** DONE navigate from index to one book
 *** TODO navigate back from one book to index
 *** login for users
-*** ldap support for users
-*** use better isbn lookup (google books)
+
+
+
+* Bugs
+** DONE nfc not enabled
+** timestamps in checkouts
+** IN-PROGRESS refresh booklist with swipe                         :mikhail:
+** getting started guide
+** reals password ldap
+** checking connection to server
+** add book button on main screen
+** show unauthorized dialog
+** IN-PROGRESS landing page nach login                                  :ck:
+** make android app it smaller
