@@ -16,9 +16,11 @@ import com.flopcode.books.BooksApi.BooksService;
 import com.flopcode.books.BooksApi.LocationsService;
 import com.flopcode.books.BooksApi.UsersService;
 import com.flopcode.books.android.views.books.BooksActivity;
+import com.flopcode.books.android.views.books.Index;
 import com.flopcode.books.models.Book;
 import com.flopcode.books.models.Location;
 import com.flopcode.books.models.User;
+import com.google.zxing.integration.android.IntentIntegrator;
 import retrofit2.Call;
 import retrofit2.Callback;
 import retrofit2.Response;
@@ -109,6 +111,10 @@ public class BooksApplication extends Application {
     getSharedPreferences(this).edit().putString(API_KEY, apiKey).commit();
   }
 
+  public Boolean hasApiKey(Context c) {
+    return (getApiKey(c) != null);
+  }
+
   public String getApiKey(Context c) {
     final String res = getPreference(c, API_KEY);
     Log.e(LOG_TAG, "using api key: " + res);
@@ -148,7 +154,17 @@ public class BooksApplication extends Application {
     locationsService = null;
   }
 
-  public void fetchData(BooksActivity a) {
+  public void fetchData(final BooksActivity a) {
+    if (!a.getBooksApplication().hasApiKey(a)) {
+      showError(a, "You don't have API key", "Add", new OnClickListener() {
+        @Override
+        public void onClick(View v) {
+          new IntentIntegrator(a).initiateScan();
+        }
+      });
+      return;
+    }
+
     createServices(a);
     fetchBooks(a);
     fetchUsers(a);
@@ -162,6 +178,7 @@ public class BooksApplication extends Application {
 
   private void createServices(BooksActivity a) {
     final String apiKey = a.getBooksApplication().getApiKey(this);
+
     if (booksService == null) {
       booksService = BooksApi.createBooksService(a.getBooksApplication().getBooksServer(this), apiKey);
     }

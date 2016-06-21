@@ -6,6 +6,7 @@ import android.net.Uri;
 import android.os.Bundle;
 import android.support.design.widget.FloatingActionButton;
 import android.support.v4.widget.SwipeRefreshLayout;
+import android.support.v7.app.AlertDialog;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.util.Log;
@@ -18,6 +19,7 @@ import android.view.ViewGroup;
 import android.widget.TextView;
 import butterknife.Bind;
 import butterknife.ButterKnife;
+import com.flopcode.books.android.BooksApplication;
 import com.flopcode.books.android.R;
 import com.flopcode.books.models.Book;
 import com.google.zxing.integration.android.IntentIntegrator;
@@ -27,6 +29,7 @@ import java.util.List;
 
 import static butterknife.ButterKnife.bind;
 import static com.flopcode.books.android.BooksApplication.LOG_TAG;
+import static com.flopcode.books.android.BooksApplication.showError;
 
 public class Index extends BooksActivity {
 
@@ -76,11 +79,8 @@ public class Index extends BooksActivity {
   protected void onResume() {
     super.onResume();
     Log.d(LOG_TAG, "Books.onResume");
-    //progressDescription.setText("fetching data from server");
 
-    getBooksApplication().fetchBooks(this);
-    getBooksApplication().fetchUsers(this);
-    getBooksApplication().fetchLocations(this);
+    getBooksApplication().fetchData(this);
   }
 
   private void updateUi() {
