@@ -3,12 +3,12 @@ jdk: oraclejdk7
 
 android:
   components:
-    - build-tools
-    - platform-tools
-    - tools
+    - platform-tools-24
+    - tools-25.1.7
+    - build-tools-24
     - android-23
-    - extra-android-m2repository
-    - extra-android-support
+    - extra-android-m2repository-33
+    - extra-android-support-23.2.1
 
 script:
     - ./gradlew build
