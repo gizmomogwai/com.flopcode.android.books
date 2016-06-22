@@ -66,4 +66,8 @@
 ** CANCELED first user should automatically be admin user               :ck:
 ** IN-PROGRESS isbn search                                            :wolf:
 ** IN-PROGRESS setup dialog                                        :mikhail:
-** fix app rotation bugs
+** TODO fix app rotation bugs
+** IN-PROGRESS hide add button for normal users                    :ck:wolf:
+** TODO owner for added books is wrong
+** TODO better search
+
