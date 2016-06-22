@@ -19,6 +19,7 @@ import android.widget.TextView;
 import butterknife.Bind;
 import butterknife.ButterKnife;
 import com.flopcode.books.android.R;
+import com.flopcode.books.android.views.FirstRunDialog;
 import com.flopcode.books.models.Book;
 import com.google.zxing.integration.android.IntentIntegrator;
 import com.google.zxing.integration.android.IntentResult;
@@ -71,6 +72,11 @@ public class Index extends BooksActivity {
         startActivity(new Intent(Index.this, Add.class).putExtra(Add.START_BARCODE_SCAN, true));
       }
     });
+
+    if (! getBooksApplication().hasRegisteredUser(this)) {
+      startActivity(new Intent(Index.this, FirstRunDialog.class));
+    }
+
   }
 
   @Override

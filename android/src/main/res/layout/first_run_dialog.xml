@@ -1,0 +1,28 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+              android:orientation="vertical"
+              android:layout_width="match_parent"
+              android:layout_height="match_parent"
+              android:background="@android:color/white">
+
+  <ImageView
+    android:id="@+id/logoImageView"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:src="@drawable/esr_logo"
+  />
+  <TableLayout android:layout_width="match_parent" android:layout_height="wrap_content">
+    <TableRow android:layout_height="wrap_content" android:layout_width="match_parent" android:gravity="center">
+      <TextView android:text="User:" android:gravity="right" android:layout_height="wrap_content" android:layout_width="match_parent"/>
+      <EditText android:hint="your username" android:layout_height="wrap_content" android:layout_width="wrap_content"/>
+    </TableRow>
+    <TableRow android:layout_height="wrap_content" android:layout_width="match_parent" android:gravity="center">
+      <TextView android:text="Server:"  android:gravity="right" android:layout_height="wrap_content" android:layout_width="match_parent"/>
+      <EditText android:text="http://books.esrlabs.com:3000" android:hint="books server address" android:layout_height="wrap_content" android:layout_width="match_parent"/>
+    </TableRow>
+    <TableRow android:layout_marginTop="30dp" android:layout_height="wrap_content" android:layout_width="match_parent" android:gravity="center">
+      <Button android:id="@+id/startUseButton" android:text="Start reading" android:layout_span="2" android:background="@drawable/esr_button"/>
+    </TableRow>
+
+  </TableLayout>
+</LinearLayout>

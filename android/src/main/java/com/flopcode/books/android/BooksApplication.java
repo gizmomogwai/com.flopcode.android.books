@@ -36,6 +36,7 @@ public class BooksApplication extends Application {
   private static final String API_KEY = "apiKey";
   private static final String BOOKS_SERVER = "booksServer";
   private static final String USER_ID = "userId";
+  private static final String USER_NAME = "userName";
   private ServerAliveService serverAliveService;
   private BooksService booksService;
   private UsersService usersService;
@@ -120,6 +121,16 @@ public class BooksApplication extends Application {
     return locations;
   }
 
+  public Boolean hasRegisteredUser(Context c) {
+    return (getUserName(c) != null);
+  }
+
+  public String getUserName(Context c) {
+    final String res = getPreference(c, USER_NAME);
+    Log.i(LOG_TAG, "Username is " + res);
+    return res;
+  }
+
   public void storeApiKey(String apiKey) {
     getSharedPreferences(this).edit().putString(API_KEY, apiKey).commit();
   }
@@ -130,7 +141,7 @@ public class BooksApplication extends Application {
 
   public String getApiKey(Context c) {
     final String res = getPreference(c, API_KEY);
-    Log.e(LOG_TAG, "using api key: " + res);
+    Log.i(LOG_TAG, "using api key: " + res);
     return res;
   }
 
