@@ -20,14 +20,7 @@ import retrofit2.Converter;
 import retrofit2.Converter.Factory;
 import retrofit2.Retrofit;
 import retrofit2.converter.gson.GsonConverterFactory;
-import retrofit2.http.DELETE;
-import retrofit2.http.Field;
-import retrofit2.http.FormUrlEncoded;
-import retrofit2.http.GET;
-import retrofit2.http.Headers;
-import retrofit2.http.POST;
-import retrofit2.http.Path;
-import retrofit2.http.Query;
+import retrofit2.http.*;
 
 import java.io.IOException;
 import java.io.StringReader;
@@ -61,6 +54,11 @@ public class BooksApi {
     @GET(LOCATIONS_API)
     @Headers("Accept: application/json")
     Call<List<Location>> index();
+  }
+
+  public interface ServerAliveService {
+    @HEAD(BOOKS_API)
+    Call<Void> alive();
   }
 
   public interface BooksService {
@@ -107,6 +105,13 @@ public class BooksApi {
       .addConverterFactory(GsonConverterFactory.create())
       .build();
     return rf.create(LocationsService.class);
+  }
+
+  public static ServerAliveService createServerAliveService(String url, String apiKey) {
+    Retrofit rf = retrofitWithLogging(apiKey)
+      .baseUrl(url)
+      .build();
+    return rf.create(ServerAliveService.class);
   }
 
   public interface ActiveCheckoutsService {

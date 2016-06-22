@@ -15,8 +15,8 @@ import com.flopcode.books.BooksApi;
 import com.flopcode.books.BooksApi.BooksService;
 import com.flopcode.books.BooksApi.LocationsService;
 import com.flopcode.books.BooksApi.UsersService;
+import com.flopcode.books.BooksApi.ServerAliveService;
 import com.flopcode.books.android.views.books.BooksActivity;
-import com.flopcode.books.android.views.books.Index;
 import com.flopcode.books.models.Book;
 import com.flopcode.books.models.Location;
 import com.flopcode.books.models.User;
@@ -25,6 +25,8 @@ import retrofit2.Call;
 import retrofit2.Callback;
 import retrofit2.Response;
 
+import java.net.HttpURLConnection;
+import java.net.URL;
 import java.util.List;
 
 public class BooksApplication extends Application {
@@ -32,6 +34,7 @@ public class BooksApplication extends Application {
   private static final String API_KEY = "apiKey";
   private static final String BOOKS_SERVER = "booksServer";
   private static final String USER_ID = "userId";
+  private ServerAliveService serverAliveService;
   private BooksService booksService;
   private UsersService usersService;
   private LocationsService locationsService;
@@ -149,6 +152,7 @@ public class BooksApplication extends Application {
   }
 
   private void clearServices() {
+    serverAliveService = null;
     booksService = null;
     usersService = null;
     locationsService = null;
@@ -166,9 +170,7 @@ public class BooksApplication extends Application {
     }
 
     createServices(a);
-    fetchBooks(a);
-    fetchUsers(a);
-    fetchLocations(a);
+    checkServerAlive(a);
   }
 
   public void fetchData(BooksActivity a, SwipeRefreshLayout updatedLayout) {
@@ -176,8 +178,22 @@ public class BooksApplication extends Application {
     updatedLayout.setRefreshing(false);
   }
 
+  public Boolean serverExists() {
+    try {
+      HttpURLConnection connection = (HttpURLConnection) new URL(getBooksServer(this)).openConnection();
+      connection.setRequestMethod("HEAD");
+      return (connection.getResponseCode() == HttpURLConnection.HTTP_OK);
+    } catch (Exception e) {
+      return false;
+    }
+  }
+
   private void createServices(BooksActivity a) {
     final String apiKey = a.getBooksApplication().getApiKey(this);
+
+    if (serverAliveService == null) {
+      serverAliveService = BooksApi.createServerAliveService(a.getBooksApplication().getBooksServer(this), apiKey);
+    }
 
     if (booksService == null) {
       booksService = BooksApi.createBooksService(a.getBooksApplication().getBooksServer(this), apiKey);
@@ -188,6 +204,28 @@ public class BooksApplication extends Application {
     if (locationsService == null) {
       locationsService = BooksApi.createLocationsService(a.getBooksApplication().getBooksServer(this), apiKey);
     }
+  }
+
+  public void checkServerAlive(final BooksActivity a) {
+    serverAliveService.alive().enqueue(new Callback<Void>() {
+
+      @Override
+      public void onResponse(Call<Void> call, Response<Void> response) {
+        fetchBooks(a);
+        fetchLocations(a);
+        fetchUsers(a);
+      }
+
+      @Override
+      public void onFailure(Call<Void> call, Throwable t) {
+        showError(a, "Server is not available", "Settings", new OnClickListener() {
+          @Override
+          public void onClick(View v) {
+            a.showPreferences();
+          }
+        });
+      }
+    });
   }
 
   public void fetchBooks(final BooksActivity a) {
