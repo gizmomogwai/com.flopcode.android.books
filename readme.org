@@ -50,14 +50,20 @@
 *** login for users
 
 * Bugs
-** DONE nfc not enabled
-** timestamps in checkouts
+** DONE nfc not enabled                                            :mikhail:
+** DONE timestamps in checkouts                                         :ck:
 ** DONE refresh booklist with swipe                                :mikhail:
-** show refresh progress from the start
+** TODO show refresh progress from the start
 ** DONE getting started guide                                           :ck:
-** reals password ldap
-** checking connection to server
-** IN-PROGRESS add book button on main screen                      :mikhail:
-** show unauthorized dialog
+** DONE real passwords ldap                                             :ck:
+** DONE checking connection to server                              :mikhail:
+** DONE add book button on main screen                             :mikhail:
+** DONE show unauthorized dialog                                   :mikhail:
 ** DONE landing page nach login                                         :ck:
-** make android app smaller
+** TODO make android app smaller
+** TODO unittests for frontend
+** TODO travis build for frontend
+** CANCELED first user should automatically be admin user               :ck:
+** IN-PROGRESS isbn search                                            :wolf:
+** IN-PROGRESS setup dialog                                        :mikhail:
+** fix app rotation bugs
