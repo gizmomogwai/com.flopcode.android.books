@@ -29,6 +29,7 @@ import com.flopcode.books.android.R;
 import com.flopcode.books.models.ActiveCheckout;
 import com.flopcode.books.models.Book;
 import com.flopcode.books.models.Location;
+import com.flopcode.books.models.User;
 import com.google.common.base.Predicate;
 import com.google.common.collect.Iterables;
 import com.google.common.collect.Lists;
@@ -217,18 +218,27 @@ public class Show extends BooksActivity {
 
   private void mount(final Book book) {
     this.book = book;
-    id.setText("nyi");//book.id);
-    isbn.setText(book.isbn);
-    title.setText(book.title);
-    authors.setText(book.authors);
-    owner.setText("nyi");
-    Location l = Iterables.find(getBooksApplication().getLocations(), new Predicate<Location>() {
-      @Override
-      public boolean apply(Location input) {
-        return input.id == book.locationId;
+    id.setText(id.getHint().toString() + " " + Long.toString(book.id));
+    isbn.setText(isbn.getHint().toString() + " " + book.isbn);
+    title.setText(title.getHint().toString() + " " + book.title);
+    authors.setText(authors.getHint().toString() + " " + book.authors);
+
+    for (User u : getBooksApplication().getUsers())
+    {
+      if (u.id == book.userId)
+      {
+        owner.setText(owner.getHint().toString() + " " + u.name);
       }
-    });
-    location.setText(l.name);
+    }
+
+    for (Location l : getBooksApplication().getLocations())
+    {
+      if (l.id == book.locationId)
+      {
+        location.setText(location.getHint().toString() + " " + l.name);
+      }
+    }
+
     checkoutCheckinButton.setText(book.activeCheckout == 0 ? "Checkout" : "Checkin");
   }
 

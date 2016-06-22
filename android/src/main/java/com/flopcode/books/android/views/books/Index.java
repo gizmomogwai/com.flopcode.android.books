@@ -6,7 +6,6 @@ import android.net.Uri;
 import android.os.Bundle;
 import android.support.design.widget.FloatingActionButton;
 import android.support.v4.widget.SwipeRefreshLayout;
-import android.support.v7.app.AlertDialog;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.util.Log;
@@ -19,7 +18,6 @@ import android.view.ViewGroup;
 import android.widget.TextView;
 import butterknife.Bind;
 import butterknife.ButterKnife;
-import com.flopcode.books.android.BooksApplication;
 import com.flopcode.books.android.R;
 import com.flopcode.books.models.Book;
 import com.google.zxing.integration.android.IntentIntegrator;
@@ -70,7 +68,7 @@ public class Index extends BooksActivity {
     addFab.setOnClickListener(new OnClickListener() {
       @Override
       public void onClick(View v) {
-        startActivity(new Intent(Index.this, Add.class));
+        startActivity(new Intent(Index.this, Add.class).putExtra(Add.START_BARCODE_SCAN, true));
       }
     });
   }

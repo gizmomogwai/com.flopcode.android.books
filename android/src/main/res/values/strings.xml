@@ -15,4 +15,10 @@
   <string name="action_write_tag_to_book">Write Tag</string>
   <string name="action_checkout_book">Checkout</string>
   <string name="action_import_api_key">Import Api Key</string>
+  <string name="hint_book_id">Book ID:</string>
+  <string name="hint_isbn">ISBN:</string>
+  <string name="hint_title">Title:</string>
+  <string name="hint_authors">Authors:</string>
+  <string name="hint_owner">Owner:</string>
+  <string name="hint_location">Location:</string>
 </resources>

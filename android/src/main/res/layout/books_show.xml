@@ -19,26 +19,32 @@
       android:orientation="vertical">
       <TextView
         android:id="@+id/book_id"
+        android:hint="@string/hint_book_id"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"/>
       <TextView
         android:id="@+id/book_isbn"
+        android:hint="@string/hint_isbn"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"/>
       <TextView
         android:id="@+id/book_title"
+        android:hint="@string/hint_title"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"/>
       <TextView
         android:id="@+id/book_authors"
+        android:hint="@string/hint_authors"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"/>
       <TextView
         android:id="@+id/book_owner"
+        android:hint="@string/hint_owner"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"/>
       <TextView
         android:id="@+id/location"
+        android:hint="@string/hint_location"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"/>
       <Button

@@ -4,7 +4,9 @@ import android.app.Activity;
 import android.app.Application;
 import android.content.Context;
 import android.content.SharedPreferences;
+import android.content.pm.ActivityInfo;
 import android.net.Uri;
+import android.os.Bundle;
 import android.preference.PreferenceManager;
 import android.support.design.widget.Snackbar;
 import android.support.v4.widget.SwipeRefreshLayout;
@@ -43,6 +45,14 @@ public class BooksApplication extends Application {
   public void onCreate() {
     super.onCreate();
     Log.e(LOG_TAG, "BooksApplication.onCreate");
+
+    // Fix screen orientation to device preferred mode
+    registerActivityLifecycleCallbacks(new ActivityLifecycleAdapter() {
+      @Override
+      public void onActivityCreated(Activity a, Bundle savedInstanceState) {
+        a.setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_NOSENSOR);
+      }
+    });
   }
 
   @Override
