@@ -188,7 +188,7 @@ public abstract class WithBooksServerTest {
   @Before
   public void setUp() throws Exception {
     System.out.println("WithBooksServerTest.setUp");
-    railsServer = AutonomeProcess.run(new File("../../server"), true, null, "WEBrick::HTTPServer#start", System.getProperty("user.home") + "/.rvm/gems/ruby-2.3.1@books/wrappers/bundle", "exec", "rake", "run_testserver");
+    railsServer = AutonomeProcess.run(new File("../server"), true, null, "WEBrick::HTTPServer#start", System.getProperty("user.home") + "/.rvm/gems/ruby-2.3.1@books/wrappers/bundle", "exec", "rake", "run_testserver");
     waitForRailsServer();
   }
 

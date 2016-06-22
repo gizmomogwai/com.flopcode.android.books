@@ -11,7 +11,9 @@ android:
     - extra-android-support
 
 script:
-    - ruby version
-    - rvm version
-    - sudo apt-get install ruby
+    - rvm install 2.3.1
+    - rvm use 2.3.1@books --create
+    - cd server
+    - gem install bundler
+    - bundle install
     - ./gradlew build
