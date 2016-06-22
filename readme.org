@@ -1,4 +1,5 @@
 * Android App for Books
+[[https://travis-ci.org/gizmomogwai/com.flopcode.books.android][https://travis-ci.org/gizmomogwai/com.flopcode.books.android.svg?branch=master]]
 ** Prerequisites / Getting started
 - you need java at least java 7
 - you need a workspace like this:
