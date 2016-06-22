@@ -11,4 +11,7 @@ android:
     - extra-android-support
 
 script:
+    - ruby version
+    - rvm version
+    - sudo apt-get install ruby
     - ./gradlew build
